@@ -1,6 +1,5 @@
 import { Base64 } from './base64.utils';
 import { IndexedDBStorage } from './indexeddb-storage';
-import { deferredPromise } from './promise.helper';
 
 interface FileMockInterface {
   path: string;
@@ -19,11 +18,7 @@ export class FileSystemMock {
   private mockedFS: MockedFS;
 
   private indexedStorage: IndexedDBStorage = new IndexedDBStorage();
-  private ready = deferredPromise();
 
-  private constructor() {
-    this.readMockedFS().then(this.ready.resolve);
-  }
   private static instance: FileSystemMock;
   static getInstance() {
     if (!FileSystemMock.instance) {
@@ -34,7 +29,7 @@ export class FileSystemMock {
 
   // returns content
   async read(path: string, offset?: number, count?: number): Promise<Uint8Array> {
-    await this.ready;
+    await this.ensureFSLoaded();
     path = this.removeExtraSlashes(path);
 
     const foundFile = this.mockedFS.files.find((i) => i.path === path);
@@ -54,7 +49,7 @@ export class FileSystemMock {
   }
 
   async write(path: string, data: Uint8Array, append?: boolean) {
-    await this.ready;
+    await this.ensureFSLoaded();
     path = this.removeExtraSlashes(path);
 
     const foundFile = this.mockedFS.files.find((i) => i.path === path);
@@ -78,9 +73,27 @@ export class FileSystemMock {
     await this.saveMockedFS();
   }
 
+  async remove(path: string) {
+    await this.ensureFSLoaded();
+    path = this.removeExtraSlashes(path);
+
+    const foundIndex = this.mockedFS.files.findIndex((i) => i.path === path);
+    // do not remove predefined file
+    if (foundIndex > -1 && foundIndex !== 0) {
+      this.mockedFS.files.splice(foundIndex, 1);
+    }
+    await this.saveMockedFS();
+  }
+
+  private async ensureFSLoaded() {
+    if (!this.mockedFS) {
+      await this.readMockedFS();
+    }
+  }
+
   private async readMockedFS() {
     const savedFS = await this.indexedStorage.getItem(fileSystemKey);
-    this.mockedFS = savedFS ?? [] as FileMockInterface[];
+    this.mockedFS = savedFS ?? { files: [] as FileMockInterface[] } as MockedFS;
   }
 
   private async saveMockedFS() {
