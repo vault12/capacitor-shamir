@@ -5,7 +5,7 @@ on:
 jobs:
   build:
     name: build status
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     env:
       # Force colored output in Github Actions logs
       FORCE_COLOR: "1"
