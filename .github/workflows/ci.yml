@@ -48,7 +48,7 @@ jobs:
         uses: jpb06/coverage-badges-action@latest
         with:
           # TODO remove second branch before merge
-          branches: main, initial-setup
+          branches: main,initial-setup
           target-branch: badges
 
       - name: '[Badges] Push badges branch ⬆️'
