@@ -4,5 +4,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['src/test/setup-tests.ts'],
+    coverage: {
+      reporter: ['json-summary'],
+    },
   },
 })

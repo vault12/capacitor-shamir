@@ -23,14 +23,33 @@ jobs:
       - name: Install Dependencies 🔧
         run: npm install
 
-      - name: Verify Web
-        run: npm run verify:web
-
-      - name: Verify iOS
+      - name: Build and Test iOS 🍏
         run: npm run verify:ios
 
-      - name: Verify Android
+      - name: Build and Test Android 🤖
         run: npm run verify:android
+
+      - name: Build Web 🌐
+        run: npm run build
+
+      - name: '[Badges] Delete remote badges branch 🔴'
+        run: git push origin --delete badges
+
+      - name: '[Badges] Create badges branch ➕'
+        run: git checkout -b badges
+
+      - name: Test Web 🔍
+        run: npm run test
+
+      - name: '[Badges] Generating coverage badges ⚙️'
+        uses: jpb06/coverage-badges-action@latest
+        with:
+          # TODO remove second branch before merge
+          branches: main, initial-setup
+          target-branch: badges
+
+      - name: '[Badges] Push badges branch ⬆️'
+        run: git push origin badges
 
       - name: Send Slack message 🔔
         # Trigger even if the job fails
