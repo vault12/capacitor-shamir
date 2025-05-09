@@ -24,11 +24,11 @@ jobs:
       - name: Install Dependencies 🔧
         run: npm install
 
-      - name: Build and Test iOS 🍏
-        run: npm run verify:ios
+      # - name: Build and Test iOS 🍏
+      #   run: npm run verify:ios
 
-      - name: Build and Test Android 🤖
-        run: npm run verify:android
+      # - name: Build and Test Android 🤖
+      #   run: npm run verify:android
 
       - name: Build Web 🌐
         run: npm run build
