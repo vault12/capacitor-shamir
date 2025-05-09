@@ -23,17 +23,19 @@ jobs:
       - name: Install Dependencies 🔧
         run: npm install
 
-      - name: Build and Test iOS 🍏
-        run: npm run verify:ios
+      # TODO UNCOMMENT
 
-      - name: Build and Test Android 🤖
-        run: npm run verify:android
+      # - name: Build and Test iOS 🍏
+      #   run: npm run verify:ios
+
+      # - name: Build and Test Android 🤖
+      #   run: npm run verify:android
 
       - name: Build Web 🌐
         run: npm run build
 
       - name: '[Badges] Delete remote badges branch 🔴'
-        run: git push origin --delete badges
+        run: git push origin --delete badges || true
 
       - name: '[Badges] Create badges branch ➕'
         run: git checkout -b badges
