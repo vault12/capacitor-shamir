@@ -4,8 +4,9 @@ on:
   pull_request:
 jobs:
   build:
-    name: build status
-    runs-on: macos-latest
+    name: build and test
+    runs-on: ubuntu-latest
+    # runs-on: macos-latest
     env:
       # Force colored output in Github Actions logs
       FORCE_COLOR: "1"
@@ -47,7 +48,7 @@ jobs:
         uses: jpb06/coverage-badges-action@latest
         with:
           # TODO remove second branch before merge
-          branches: main, initial-setup
+          # branches: main, initial-setup
           target-branch: badges
 
       - name: '[Badges] Push badges branch ⬆️'
