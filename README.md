@@ -3,8 +3,9 @@
 <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml">
   <img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Github Actions Build Status" />
 </a>
+<!-- # TODO BEFORE MERGE: update ref to public when repo becomes public -->
 <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml">
-  <img src="https://raw.githubusercontent.com/vault12/capacitor-shamir/badges/badges/coverage-total.svg" alt="Coverage total" />
+  <img src="https://raw.githubusercontent.com/vault12/capacitor-shamir/refs/heads/badges/badges/coverage-total.svg?token=GHSAT0AAAAAACTWIJNFCR3D452EHWIAB7XE2A55QXA" alt="Coverage total" />
 </a>
 
 Provides Shamir's Secret Sharing (SSS) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.
