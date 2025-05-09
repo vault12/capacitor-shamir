@@ -5,8 +5,8 @@ on:
 jobs:
   build:
     name: build and test
-    runs-on: ubuntu-latest
-    # runs-on: macos-latest
+    # runs-on: ubuntu-latest
+    runs-on: macos-latest
     env:
       # Force colored output in Github Actions logs
       FORCE_COLOR: "1"
@@ -24,13 +24,11 @@ jobs:
       - name: Install Dependencies 🔧
         run: npm install
 
-      # TODO UNCOMMENT
+      - name: Build and Test iOS 🍏
+        run: npm run verify:ios
 
-      # - name: Build and Test iOS 🍏
-      #   run: npm run verify:ios
-
-      # - name: Build and Test Android 🤖
-      #   run: npm run verify:android
+      - name: Build and Test Android 🤖
+        run: npm run verify:android
 
       - name: Build Web 🌐
         run: npm run build
