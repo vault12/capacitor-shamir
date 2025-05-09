@@ -5,7 +5,6 @@ on:
 jobs:
   build:
     name: build and test
-    # runs-on: ubuntu-latest
     runs-on: macos-latest
     env:
       # Force colored output in Github Actions logs
@@ -13,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node 🔧
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22.13.0
           cache: 'npm'
@@ -24,11 +23,11 @@ jobs:
       - name: Install Dependencies 🔧
         run: npm install
 
-      # - name: Build and Test iOS 🍏
-      #   run: npm run verify:ios
+      - name: Build and Test iOS 🍏
+        run: npm run verify:ios
 
-      # - name: Build and Test Android 🤖
-      #   run: npm run verify:android
+      - name: Build and Test Android 🤖
+        run: npm run verify:android
 
       - name: Build Web 🌐
         run: npm run build
