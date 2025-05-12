@@ -42,7 +42,7 @@ public class ShamirCore {
         if (threshold < 2) { throw new SimpleException(TAG, "split() threshold must be two or more"); }
         if (threshold > totalShards) { throw new SimpleException(TAG, "split() totalShards must be >= threshold"); }
         if (threshold > 255) { throw new SimpleException(TAG, "split() threshold must be <= 255"); }
-        if (totalShards > 255) { throw new SimpleException(TAG, "split() totalShards must be <= 255>"); }
+        if (totalShards > 255) { throw new SimpleException(TAG, "split() totalShards must be <= 255"); }
         int progressReportCounter = 0;
         byte [][] shards = new byte[totalShards][secret.length];
         for (int i = 0; i < secret.length; i++) {
