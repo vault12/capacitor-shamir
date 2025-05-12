@@ -3,7 +3,7 @@
 <!-- # TODO BEFORE MERGE: update coverage badge url to public (without token) when repo becomes public -->
 <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Github Actions Build Status" /></a>&nbsp;<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage total" /></a>
 
-Provides Shamir's Secret Sharing (SSS) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.
+Capacitor plugin which provides [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.
 
 ## Install
 
@@ -13,6 +13,18 @@ npx cap sync
 ```
 
 ## API
+
+### Overview
+
+- Implementation contains memory-based and filesystem-bases API methods for:
+  - splitting the secret data into encrypted shards;
+  - restoring secred data from encrypted shards;
+  - restoring N-th secret shard from encrypted shards.
+- All methods are callback-based to ensure continuous progress reporting.
+- Job is considered done when returned `data` object in callback contains truthy value of result property - `dataBase64`, `shardsBase64`, `shardsPath`, `shardsPaths`, `dstPath`. Progress should be used for displaying job progress only and should not be used to track job finish. In other words, consider job done when `!!dataBase64` but not when `progress === 100`.
+- Since Capacitor doesn't support passing blob data, Base64 strings are used instead.
+
+## Methods
 
 <docgen-index>
 
@@ -36,10 +48,12 @@ npx cap sync
 generateShards(options: { totalShards: number; threshold: number; inputDataBase64: string; }, callback: (data?: { progress: number; shardsBase64?: string[]; }, error?: any) => void) => Promise<void>
 ```
 
-| Param          | Type                                                                                         |
-| -------------- | -------------------------------------------------------------------------------------------- |
-| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; }</code>            |
-| **`callback`** | <code>(data?: { progress: number; shardsBase64?: string[]; }, error?: any) =&gt; void</code> |
+Splits secret data (Base64) into encrypted shards in memory.
+
+| Param          | Type                                                                                         | Description                                                           |
+| -------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; }</code>            | - totalShards, threshold, and inputDataBase64 (Base64-encoded secret) |
+| **`callback`** | <code>(data?: { progress: number; shardsBase64?: string[]; }, error?: any) =&gt; void</code> | - Reports progress and returns shards as Base64 strings               |
 
 --------------------
 
@@ -50,10 +64,12 @@ generateShards(options: { totalShards: number; threshold: number; inputDataBase6
 restoreFromShards(options: { inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: any) => void) => Promise<void>
 ```
 
-| Param          | Type                                                                                     |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| **`options`**  | <code>{ inputShardsBase64: string[]; }</code>                                            |
-| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> |
+Restores secret data from encrypted shards (all in memory, Base64).
+
+| Param          | Type                                                                                     | Description                                              |
+| -------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **`options`**  | <code>{ inputShardsBase64: string[]; }</code>                                            | - inputShardsBase64: array of Base64-encoded shards      |
+| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> | - Reports progress and returns restored secret as Base64 |
 
 --------------------
 
@@ -64,10 +80,12 @@ restoreFromShards(options: { inputShardsBase64: string[]; }, callback: (data?: {
 restoreShard(options: { shardIndex: number; inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: any) => void) => Promise<void>
 ```
 
-| Param          | Type                                                                                     |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| **`options`**  | <code>{ shardIndex: number; inputShardsBase64: string[]; }</code>                        |
-| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> |
+Restores a specific shard from a set of encrypted shards (all in memory, Base64).
+
+| Param          | Type                                                                                     | Description                                                  |
+| -------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| **`options`**  | <code>{ shardIndex: number; inputShardsBase64: string[]; }</code>                        | - shardIndex and inputShardsBase64                           |
+| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> | - Reports progress and returns the requested shard as Base64 |
 
 --------------------
 
@@ -78,10 +96,12 @@ restoreShard(options: { shardIndex: number; inputShardsBase64: string[]; }, call
 generateFileShards(options: { totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[]; }, error?: any) => void) => Promise<void>
 ```
 
-| Param          | Type                                                                                           |
-| -------------- | ---------------------------------------------------------------------------------------------- |
-| **`options`**  | <code>{ totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }</code> |
-| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: any) =&gt; void</code>    |
+Splits a file into encrypted shard files.
+
+| Param          | Type                                                                                           | Description                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| **`options`**  | <code>{ totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }</code> | - totalShards, threshold, srcPath (input file), dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: any) =&gt; void</code>    | - Reports progress and returns paths to shard files                            |
 
 --------------------
 
@@ -92,10 +112,12 @@ generateFileShards(options: { totalShards: number; threshold: number; srcPath: s
 generateShardsToFiles(options: { totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[]; }, error?: any) => void) => Promise<void>
 ```
 
-| Param          | Type                                                                                                   |
-| -------------- | ------------------------------------------------------------------------------------------------------ |
-| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }</code> |
-| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: any) =&gt; void</code>            |
+Splits secret data (Base64) into encrypted shard files.
+
+| Param          | Type                                                                                                   | Description                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }</code> | - totalShards, threshold, inputDataBase64, dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: any) =&gt; void</code>            | - Reports progress and returns paths to shard files                       |
 
 --------------------
 
@@ -106,10 +128,12 @@ generateShardsToFiles(options: { totalShards: number; threshold: number; inputDa
 restoreFromFileShards(options: { shardsPaths: string[]; dstPath: string; }, callback: (data?: { progress: number; dstPath?: string; }, error?: any) => void) => Promise<void>
 ```
 
-| Param          | Type                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------- |
-| **`options`**  | <code>{ shardsPaths: string[]; dstPath: string; }</code>                              |
-| **`callback`** | <code>(data?: { progress: number; dstPath?: string; }, error?: any) =&gt; void</code> |
+Restores a file from encrypted shard files.
+
+| Param          | Type                                                                                  | Description                                         |
+| -------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **`options`**  | <code>{ shardsPaths: string[]; dstPath: string; }</code>                              | - shardsPaths (input files), dstPath (output file)  |
+| **`callback`** | <code>(data?: { progress: number; dstPath?: string; }, error?: any) =&gt; void</code> | - Reports progress and returns the output file path |
 
 --------------------
 
@@ -120,10 +144,12 @@ restoreFromFileShards(options: { shardsPaths: string[]; dstPath: string; }, call
 restoreFromFileShardsToData(options: { shardsPaths: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: any) => void) => Promise<void>
 ```
 
-| Param          | Type                                                                                     |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| **`options`**  | <code>{ shardsPaths: string[]; }</code>                                                  |
-| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> |
+Restores secret data (Base64) from encrypted shard files.
+
+| Param          | Type                                                                                     | Description                                              |
+| -------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **`options`**  | <code>{ shardsPaths: string[]; }</code>                                                  | - shardsPaths (input files)                              |
+| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> | - Reports progress and returns restored secret as Base64 |
 
 --------------------
 
@@ -134,10 +160,12 @@ restoreFromFileShardsToData(options: { shardsPaths: string[]; }, callback: (data
 restoreFileShard(options: { shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }, callback: (data?: { progress: number; shardPath?: string; }, error?: any) => void) => Promise<void>
 ```
 
-| Param          | Type                                                                                    |
-| -------------- | --------------------------------------------------------------------------------------- |
-| **`options`**  | <code>{ shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }</code>        |
-| **`callback`** | <code>(data?: { progress: number; shardPath?: string; }, error?: any) =&gt; void</code> |
+Restores a specific shard file from a set of encrypted shard files.
+
+| Param          | Type                                                                                    | Description                                                             |
+| -------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **`options`**  | <code>{ shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }</code>        | - shardIndex, shardsPaths (input files), dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardPath?: string; }, error?: any) =&gt; void</code> | - Reports progress and returns the path to the restored shard file      |
 
 --------------------
 
