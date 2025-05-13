@@ -34,7 +34,7 @@ export class FileSystemMock {
 
     const foundFile = this.mockedFS.files.find((i) => i.path === path);
     if (!foundFile) {
-      throw new Error('V12File.mock: File not found');
+      throw new Error('FileSystemMock: File not found');
     }
     let content = foundFile.content.fromBase64();
     // cut everything up to offset
@@ -100,7 +100,7 @@ export class FileSystemMock {
     try {
       await this.indexedStorage.setItem(fileSystemKey, this.mockedFS);
     } catch (error) {
-      console.error('[V12FileMock]', error);
+      console.error('[FileSystemMock]', error);
       if ((error as DOMException).message.includes('exceeded the quota')) {
         throw new Error('NotEnoughDiskSpace');
       }

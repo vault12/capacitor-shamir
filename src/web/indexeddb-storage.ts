@@ -1,5 +1,5 @@
-export const dbName = 'v12MockDb';
-export const storeName = 'v12MockStore';
+export const dbName = 'MockDb';
+export const storeName = 'MockStore';
 export const VERSION: number = 1 as const;
 
 /**
