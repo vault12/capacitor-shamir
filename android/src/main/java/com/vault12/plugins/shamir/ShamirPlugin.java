@@ -91,8 +91,8 @@ public class ShamirPlugin extends Plugin {
                 JSArray shardsBase64 = call.getArray("inputShardsBase64");
                 Map<Short, byte[]> shards = parseShardsWithIndexesFromBase64(shardsBase64);
                 int newIndex = call.getInt("shardIndex");
-                if (newIndex > 255) {
-                    call.reject(PREFIX + "restoreShard() Shard index must be <= 255");
+                if (newIndex < 0 || newIndex > 255) {
+                    call.reject(PREFIX + "restoreShard() Shard index must be between 0 and 255");
                     return;
                 }
                 call.setKeepAlive(true);
