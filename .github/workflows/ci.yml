@@ -1,7 +1,6 @@
 name: build status
 on:
   push:
-  pull_request:
 jobs:
   build:
     name: build and test
