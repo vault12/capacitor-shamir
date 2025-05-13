@@ -38,7 +38,7 @@ jobs:
       - name: '[Badges] Generating coverage badges ⚙️'
         uses: jpb06/coverage-badges-action@latest
         with:
-          # TODO remove second branch before merge
+          # TODO remove `initial-setup` before merge
           branches: main,initial-setup
           target-branch: badges
 
