@@ -10,7 +10,7 @@
 export type RandomBytes = (length: number) => Uint8Array;
 export type Parts = Record<string, Uint8Array>;
 
-export function add(a: number, b: number) {
+function add(a: number, b: number) {
   return a ^ b;
 }
 
@@ -20,7 +20,7 @@ Page 120 (134) section "20.3 Addition in GP(2^n)" is equal \
 to subtraction.
 */
 
-export function sub(a: number, b: number) {
+function sub(a: number, b: number) {
   return add(a, b);
 }
 
@@ -142,19 +142,19 @@ const EXP = new Uint8Array([
   0x24, 0x6c, 0xb4, 0xc7, 0x52, 0xf6,
 ]);
 
-export function mul(a: number, b: number) {
+function mul(a: number, b: number) {
   if (a === 0 || b === 0) {
     return 0;
   }
   return EXP[LOG[a] + LOG[b]];
 }
 
-export function div(a: number, b: number) {
+function div(a: number, b: number) {
   // multiply by the inverse of b
   return mul(a, EXP[255 - LOG[b]]);
 }
 
-export function degree(p: Uint8Array) {
+function degree(p: Uint8Array) {
   // eslint-disable-next-line no-plusplus
   for (let i = p.length - 1; i >= 1; i--) {
     if (p[i] !== 0) {
@@ -166,7 +166,7 @@ export function degree(p: Uint8Array) {
 
 /**
  * Calculates f(partIdx) of the given points using Lagrangian interpolation.
- * @param  {array[Uint8Array]} points The supplied point.
+ * @param  {Uint8Array} points The supplied point.
  * @param  {Number} partIdx The index to interpolate at.
  */
 export function interpolate(points: Uint8Array[], partIdx: number = 0) {
@@ -191,10 +191,10 @@ export function interpolate(points: Uint8Array[], partIdx: number = 0) {
 
 /**
  * Generates a random polynomal of the correct degree and sets x as the first coefficient.
- * @param  {function int -> array[Uint8Array]} randomBytes Takes a length and returns a
+ * @param  {(number) => Uint8Array} randomBytes Takes a length and returns a
  * Uint8Array of that length.
- * @param  {Number} d The degree of the polynomial driven by the number shares and join threshold.
- * @param {Number} x The point to hide.
+ * @param  {number} d The degree of the polynomial driven by the number shares and join threshold.
+ * @param {number} x The point to hide.
  * @return {Uint8Array} The random polynomial with x as the fist coefficient.
  */
 export function generate(randomBytes: RandomBytes, d: number, x: number): Uint8Array {

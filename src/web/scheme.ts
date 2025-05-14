@@ -16,7 +16,7 @@ import { evaluate, generate, interpolate, Parts, RandomBytes } from './GF256';
  * Uint8Array of that length
  * @param  {number} n the number of parts to produce (must be {@code >1})
  * @param  {number} k the threshold of joinable parts (must be {@code <= n})
- * @param  {[Uint8Array]} secret The secret to split as an array of bytes
+ * @param  {Uint8Array} secret The secret to split as an array of bytes
  * @return {{ [key: string]: Uint8Array }} an map of {@code n} parts that are arrays of bytes of the
  * secret length
  */
