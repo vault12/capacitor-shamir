@@ -2,6 +2,7 @@ import '../web/base64.utils';
 import { Shamir } from '../index';
 import { FileSystemMock } from '../web/file-system.mock';
 import { expect, test } from 'vitest';
+import { toBase64, fromBase64 } from '../web/base64.utils';
 
 const fs = FileSystemMock.getInstance();
 
@@ -16,7 +17,7 @@ async function random_bytes(size: number) {
 }
 
 async function prepareInMemoryStuff() {
-  const srcBase64 = (await random_bytes( 1024 * 40)).toBase64();
+  const srcBase64 = toBase64(await random_bytes(1024 * 40));
   const shardsBase64 = await new Promise<string[]>((resolve, reject) => {
     Shamir.generateShards({ threshold: 2, totalShards: 3, inputDataBase64: srcBase64 }, (data, error) => {
       if (error) { reject(error); }
@@ -29,8 +30,8 @@ async function prepareInMemoryStuff() {
 test('generateShards', async () => {
   const { srcBase64, shardsBase64 } = await prepareInMemoryStuff();
   expect(shardsBase64.length).to.equal(3);
-  const srcLength = srcBase64.fromBase64().length;
-  const shardsLengths = shardsBase64.map(shard => shard.fromBase64().length);
+  const srcLength = fromBase64(srcBase64).length;
+  const shardsLengths = shardsBase64.map(shard => fromBase64(shard).length);
   for (const length of shardsLengths) {
     expect(length).to.equal(srcLength + 1);
   }
@@ -66,7 +67,7 @@ async function prepareFileStuff() {
   await fs.remove(absSrcPath);
   await fs.remove(absRestoredPath);
   const srcData = await random_bytes(1024 * 20);
-  const srcBase64 = srcData.toBase64();
+  const srcBase64 = toBase64(srcData);
   await fs.write(absSrcPath, srcData);
   const absDstShardsPathRoot = `${tempDir}/test-shards/`;
   const absDstShardPath = `${tempDir}/test-shard/`;
@@ -83,11 +84,11 @@ async function prepareFileStuff() {
 
 test('generateFileShards', async () => {
   const { shardPaths, srcBase64 } = await prepareFileStuff();
-  const srcLength = srcBase64.fromBase64().length;
+  const srcLength = fromBase64(srcBase64).length;
   expect(shardPaths.length).to.equal(3);
   for (const shardPath of shardPaths) {
-    const shardBase64 = (await fs.read(shardPath)).toBase64();
-    const shard = shardBase64.fromBase64();
+    const shardBase64 = toBase64(await fs.read(shardPath));
+    const shard = fromBase64(shardBase64);
     expect(shard.length).to.equal(srcLength + 1);
   }
 });
@@ -100,11 +101,11 @@ test('restoreFromFileShardsToFile', async () => {
       if (data?.dstPath) { resolve(data?.dstPath); }
     });
   });
-  const restoredBase64 = (await fs.read(restoredPath)).toBase64();
+  const restoredBase64 = toBase64(await fs.read(restoredPath));
   expect(restoredBase64).to.equal(srcBase64);
 });
 
- test('restoreFromFileShardsToData', async () => {
+test('restoreFromFileShardsToData', async () => {
   const { shardPaths, srcBase64 } = await prepareFileStuff();
   const restoredBase64 = await new Promise<string>((resolve, reject) => {
     Shamir.restoreFromFileShardsToData({ shardsPaths: shardPaths }, (data, error) => {
@@ -126,13 +127,13 @@ test('restoreFileShard', async () => {
         if (data?.shardPath) { resolve(data?.shardPath); }
       });
   });
-  const restoredBase64 = (await fs.read(restoredPath)).toBase64();
-  const srcShardBase64 = (await fs.read(shardPaths[idx - 1])).toBase64();
+  const restoredBase64 = toBase64(await fs.read(restoredPath));
+  const srcShardBase64 = toBase64(await fs.read(shardPaths[idx - 1]));
   expect(restoredBase64).to.equal(srcShardBase64);
 });
 
 test('generateShardsToFiles', async () => {
-  const srcBase64 = (await random_bytes( 1024 * 20)).toBase64();
+  const srcBase64 = toBase64(await random_bytes(1024 * 20));
   const tempDir = 'temp';
   const absDstShardsPathRoot = `${tempDir}/test-shards/`;
   const shardPaths = await new Promise<string[]>((resolve, reject) => {
@@ -143,11 +144,11 @@ test('generateShardsToFiles', async () => {
         if (data?.shardsPaths) { resolve(data?.shardsPaths); }
       });
   });
-  const srcLength = srcBase64.fromBase64().length;
+  const srcLength = fromBase64(srcBase64).length;
   expect(shardPaths.length).to.equal(3);
   for (const shardPath of shardPaths) {
-    const shardBase64 = (await fs.read(shardPath)).toBase64();
-    const shard = shardBase64.fromBase64();
+    const shardBase64 = toBase64(await fs.read(shardPath));
+    const shard = fromBase64(shardBase64);
     expect(shard.length).to.equal(srcLength + 1);
   }
   const restoredBase64 = await new Promise<string>((resolve, reject) => {

@@ -3,6 +3,7 @@ import { FileSystemMock } from './web/file-system.mock';
 import { join, restorePart, split } from './web/scheme';
 import { Parts } from './web/GF256';
 import { ShamirPlugin } from './definitions';
+import { fromBase64, toBase64 } from './web/base64.utils';
 
 export class ShamirWeb extends WebPlugin implements ShamirPlugin {
   private fs = FileSystemMock.getInstance();
@@ -16,7 +17,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
       randomBytes,
       totalShards,
       threshold,
-      inputDataBase64.fromBase64(),
+      fromBase64(inputDataBase64),
     );
     const shards: Uint8Array[] = Object.entries(parts).map(([shardIdx, shardData]: [string, Uint8Array]) => {
       const shardIdxBytes = new Uint8Array([parseInt(shardIdx)])
@@ -25,7 +26,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
       shardBytes.set(shardData, shardIdxBytes.length);
       return shardBytes;
     });
-    callback({ progress: 100, shardsBase64: shards.map(shard => shard.toBase64()) });
+    callback({ progress: 100, shardsBase64: shards.map(shard => toBase64(shard)) });
     return Promise.resolve();
   }
 
@@ -33,7 +34,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     { inputShardsBase64 }: { inputShardsBase64: string[]; },
     callback: (data: { progress: number, dataBase64?: string }, error?: string) => void
   ): Promise<void> {
-    const inputShards = inputShardsBase64.map(shardBase64 => shardBase64.fromBase64());
+    const inputShards = inputShardsBase64.map(shardBase64 => fromBase64(shardBase64));
     const parts = inputShards.reduce((acc, shardBytes) => {
       const shardIdx = shardBytes.subarray(0, 1)[0];
       const shardData = shardBytes.subarray(1);
@@ -41,7 +42,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
       return acc;
     }, {} as Parts);
     const result = join(parts);
-    callback({ progress: 100, dataBase64: result.toBase64() });
+    callback({ progress: 100, dataBase64: toBase64(result) });
     return Promise.resolve();
   }
 
@@ -49,7 +50,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     { shardIndex, inputShardsBase64 }: { shardIndex: number; inputShardsBase64: string[]; },
     callback: (data: { progress: number, dataBase64?: string }, error?: string) => void
   ): Promise<void> {
-    const inputShards = inputShardsBase64.map(shardBase64 => shardBase64.fromBase64());
+    const inputShards = inputShardsBase64.map(shardBase64 => fromBase64(shardBase64));
     const parts = inputShards.reduce((acc, shardBytes) => {
       const shardIdx = shardBytes.subarray(0, 1)[0];
       const shardData = shardBytes.subarray(1);
@@ -61,7 +62,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     const shardIdxBytes = new Uint8Array([shardIndex]);
     restoredShard.set(shardIdxBytes);
     restoredShard.set(restoredPart, shardIdxBytes.length);
-    callback({ progress: 100, dataBase64: restoredShard.toBase64() });
+    callback({ progress: 100, dataBase64: toBase64(restoredShard) });
     return Promise.resolve();
   }
 
@@ -70,7 +71,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     callback: (data: { progress: number, shardsPaths?: string[] }, error?: string) => void
   ): Promise<void> {
     const inputData = await this.fs.read(srcPath);
-    const inputDataBase64 = inputData.toBase64();
+    const inputDataBase64 = toBase64(inputData);
     await this.generateShardsToFiles({ totalShards, threshold, inputDataBase64, dstPathRoot }, callback);
     return Promise.resolve();
   }
@@ -84,7 +85,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         if (error) {
           reject(error);
         } else {
-          const shards = shardsBase64.map(shardBase64 => shardBase64.fromBase64());
+          const shards = shardsBase64.map(shardBase64 => fromBase64(shardBase64));
           const id = this.generateJobId();
           const shardsPaths: string[] = [];
           for (let i = 0; i < shards.length; i++) {
@@ -109,7 +110,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         if (error) {
           reject(error);
         } else {
-          await this.fs.write(dstPath, dataBase64.fromBase64());
+          await this.fs.write(dstPath, fromBase64(dataBase64));
           callback({ progress, dstPath });
           resolve();
         }
@@ -125,7 +126,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     const shardsBase64: string[] = [];
     for (const path of shardsPaths) {
       const data = await this.fs.read(path);
-      shardsBase64.push(data.toBase64());
+      shardsBase64.push(toBase64(data));
     }
     await new Promise<void>(async (resolve, reject) => {
       await this.restoreFromShards({ inputShardsBase64: shardsBase64 }, async ({ progress, dataBase64 }, error) => {
@@ -147,7 +148,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     const shardsBase64: string[] = [];
     for (const shardPath of shardsPaths) {
       const data = await this.fs.read(shardPath);
-      shardsBase64.push(data.toBase64());
+      shardsBase64.push(toBase64(data));
     }
     await new Promise<void>(async (resolve, reject) => {
       this.restoreShard({ shardIndex, inputShardsBase64: shardsBase64 }, async ({ progress, dataBase64 }, error) => {
@@ -156,7 +157,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         } else {
           const id = this.generateJobId();
           const shardPath = this.formatShardPath(dstPathRoot, id, shardIndex);
-          await this.fs.write(shardPath, dataBase64.fromBase64());
+          await this.fs.write(shardPath, fromBase64(dataBase64));
           callback({ progress, shardPath });
           resolve();
         }

@@ -1,4 +1,4 @@
-import { Base64 } from './base64.utils';
+import { Base64, fromBase64, toBase64 } from './base64.utils';
 import { IndexedDBStorage } from './indexeddb-storage';
 
 interface FileMockInterface {
@@ -36,7 +36,7 @@ export class FileSystemMock {
     if (!foundFile) {
       throw new Error('FileSystemMock: File not found');
     }
-    let content = foundFile.content.fromBase64();
+    let content = fromBase64(foundFile.content);
     // cut everything up to offset
     if (offset) {
       content = content.slice(offset);
@@ -55,19 +55,19 @@ export class FileSystemMock {
     const foundFile = this.mockedFS.files.find((i) => i.path === path);
     if (foundFile) {
       if (append) {
-        const currentData = foundFile.content.fromBase64();
+        const currentData = fromBase64(foundFile.content);
         const appended = new Uint8Array(currentData.length + data.length);
         appended.set(currentData);
         appended.set(data, currentData.length);
-        foundFile.content = appended.toBase64();
+        foundFile.content = toBase64(appended);
       } else {
-        foundFile.content = data.toBase64();
+        foundFile.content = toBase64(data);
       }
     } else {
       this.mockedFS.files.push({
         path: path,
         mtime: new Date().getTime(),
-        content: data.toBase64(),
+        content: toBase64(data),
       });
     }
     await this.saveMockedFS();
