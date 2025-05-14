@@ -12,12 +12,12 @@ import { evaluate, generate, interpolate, Parts, RandomBytes } from './GF256';
 /**
  * Splits the given secret into {@code n} parts, of which any {@code k} or more can be combined to
  * recover the original secret.
- * @param  {function int -> Uint8Array} randomBytes Takes a length and returns a random
+ * @param  {(number) => Uint8Array} randomBytes Takes a length and returns a random
  * Uint8Array of that length
- * @param  {Number} n the number of parts to produce (must be {@code >1})
- * @param  {Number} k the threshold of joinable parts (must be {@code <= n})
- * @param  {array[Uint8Array]} secret The secret to split as an array of bytes
- * @return {Object.<string, Uint8Array>} an map of {@code n} parts that are arrays of bytes of the
+ * @param  {number} n the number of parts to produce (must be {@code >1})
+ * @param  {number} k the threshold of joinable parts (must be {@code <= n})
+ * @param  {[Uint8Array]} secret The secret to split as an array of bytes
+ * @return {{ [key: string]: Uint8Array }} an map of {@code n} parts that are arrays of bytes of the
  * secret length
  */
 export function split(randomBytes: RandomBytes, n: number, k: number, secret: Uint8Array): Parts {
@@ -46,8 +46,6 @@ export function split(randomBytes: RandomBytes, n: number, k: number, secret: Ui
   return parts;
 }
 
-exports.split = split;
-
 /**
  * Joins the given parts to recover the original secret.
  *
@@ -55,7 +53,7 @@ exports.split = split;
  * original secret. If the parts are incorrect, or are under the threshold value used to split the
  * secret, a random value will be returned.
  *
- * @param {Object.<string, Uint8Array>} parts an map of {@code n} parts that are arrays of bytes
+ * @param {{ [key: string]: Uint8Array }} parts an map of {@code n} parts that are arrays of bytes
  * of the secret length
  * @return {Uint8Array} the original secret
  *
@@ -87,13 +85,10 @@ export function join(parts: Parts): Uint8Array {
   return secret;
 }
 
-exports.join = join;
-
-
 /**
  * Restores a part given a map of parts and a new index.
  *
- * @param {Object.<string, Uint8Array>} parts a map of part IDs to part values
+ * @param {{ [key: string]: Uint8Array }} parts a map of part IDs to part values
  * @param {number} partIdx the new index for the part
  * @return {Uint8Array} the restored part
  * @throws {Error} if parts is empty or contains values of varying lengths
@@ -122,5 +117,3 @@ export function restorePart(parts: Parts, partIdx: number): Uint8Array {
   }
   return restoredPart;
 }
-
-exports.restorePart = restorePart;

@@ -78,8 +78,7 @@ export class FileSystemMock {
     path = this.removeExtraSlashes(path);
 
     const foundIndex = this.mockedFS.files.findIndex((i) => i.path === path);
-    // do not remove predefined file
-    if (foundIndex > -1 && foundIndex !== 0) {
+    if (foundIndex > -1) {
       this.mockedFS.files.splice(foundIndex, 1);
     }
     await this.saveMockedFS();
@@ -97,15 +96,7 @@ export class FileSystemMock {
   }
 
   private async saveMockedFS() {
-    try {
-      await this.indexedStorage.setItem(fileSystemKey, this.mockedFS);
-    } catch (error) {
-      console.error('[FileSystemMock]', error);
-      if ((error as DOMException).message.includes('exceeded the quota')) {
-        throw new Error('NotEnoughDiskSpace');
-      }
-      throw error;
-    }
+    await this.indexedStorage.setItem(fileSystemKey, this.mockedFS);
   }
 
   private removeExtraSlashes(path: string) {

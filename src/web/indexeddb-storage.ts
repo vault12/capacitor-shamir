@@ -6,7 +6,7 @@ export const VERSION: number = 1 as const;
  * simple indexedDB key-value storage.
  *
  * indexedDB, as transactional db, has bit clunky API,
- * this service imlements localStorage-like API for iDB, but wrapped in promises
+ * this service implements localStorage-like API for iDB, but wrapped in promises
  *
  * localstorage has very low storage limit (5MB)
  * so for development it's sometimes not enough space to save
