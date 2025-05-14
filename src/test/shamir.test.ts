@@ -6,7 +6,7 @@ import { toBase64, fromBase64 } from '../web/base64.utils';
 
 const fs = FileSystemMock.getInstance();
 
-async function random_bytes(size: number) {
+async function randomBytes(size: number) {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     const arr = new Uint8Array(size);
     crypto.getRandomValues(arr);
@@ -17,7 +17,7 @@ async function random_bytes(size: number) {
 }
 
 async function prepareInMemoryStuff() {
-  const srcBase64 = toBase64(await random_bytes(1024 * 40));
+  const srcBase64 = toBase64(await randomBytes(1024 * 40));
   const shardsBase64 = await new Promise<string[]>((resolve, reject) => {
     Shamir.generateShards({ threshold: 2, totalShards: 3, inputDataBase64: srcBase64 }, (data, error) => {
       if (error) { reject(error); }
@@ -66,7 +66,7 @@ async function prepareFileStuff() {
   const absRestoredPath = `${tempDir}/test-shamir-file-restored-${Math.random().toString(36)}`;
   await fs.remove(absSrcPath);
   await fs.remove(absRestoredPath);
-  const srcData = await random_bytes(1024 * 20);
+  const srcData = await randomBytes(1024 * 20);
   const srcBase64 = toBase64(srcData);
   await fs.write(absSrcPath, srcData);
   const absDstShardsPathRoot = `${tempDir}/test-shards/`;
@@ -133,7 +133,7 @@ test('restoreFileShard', async () => {
 });
 
 test('generateShardsToFiles', async () => {
-  const srcBase64 = toBase64(await random_bytes(1024 * 20));
+  const srcBase64 = toBase64(await randomBytes(1024 * 20));
   const tempDir = 'temp';
   const absDstShardsPathRoot = `${tempDir}/test-shards/`;
   const shardPaths = await new Promise<string[]>((resolve, reject) => {
