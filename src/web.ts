@@ -8,7 +8,7 @@ import { fromBase64, toBase64 } from './web/base64.utils';
 export class ShamirWeb extends WebPlugin implements ShamirPlugin {
   private fs = FileSystemMock.getInstance();
 
-  generateShards(
+  async generateShards(
     { totalShards, threshold, inputDataBase64 }: { totalShards: number; threshold: number; inputDataBase64: string; },
     callback: (data: { progress: number, shardsBase64?: string[] }, error?: string) => void
   ): Promise<void> {
@@ -27,10 +27,9 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
       return shardBytes;
     });
     callback({ progress: 100, shardsBase64: shards.map(shard => toBase64(shard)) });
-    return Promise.resolve();
   }
 
-  restoreFromShards(
+  async restoreFromShards(
     { inputShardsBase64 }: { inputShardsBase64: string[]; },
     callback: (data: { progress: number, dataBase64?: string }, error?: string) => void
   ): Promise<void> {
@@ -43,10 +42,9 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     }, {} as Parts);
     const result = join(parts);
     callback({ progress: 100, dataBase64: toBase64(result) });
-    return Promise.resolve();
   }
 
-  restoreShard(
+  async restoreShard(
     { shardIndex, inputShardsBase64 }: { shardIndex: number; inputShardsBase64: string[]; },
     callback: (data: { progress: number, dataBase64?: string }, error?: string) => void
   ): Promise<void> {
@@ -63,7 +61,6 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     restoredShard.set(shardIdxBytes);
     restoredShard.set(restoredPart, shardIdxBytes.length);
     callback({ progress: 100, dataBase64: toBase64(restoredShard) });
-    return Promise.resolve();
   }
 
   async generateFileShards(
@@ -73,7 +70,6 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
     const inputData = await this.fs.read(srcPath);
     const inputDataBase64 = toBase64(inputData);
     await this.generateShardsToFiles({ totalShards, threshold, inputDataBase64, dstPathRoot }, callback);
-    return Promise.resolve();
   }
 
   async generateShardsToFiles(
@@ -98,7 +94,6 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         }
       });
     });
-    return Promise.resolve();
   }
 
   async restoreFromFileShards(
@@ -116,7 +111,6 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         }
       });
     });
-    return Promise.resolve();
   }
 
   async restoreFromFileShardsToData(
@@ -138,7 +132,6 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         }
       });
     })
-    return Promise.resolve();
   }
 
   async restoreFileShard(
@@ -163,7 +156,6 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         }
       });
     });
-    return Promise.resolve();
   }
 
   private formatShardPath(dirPath: string, id: string, index: number) {

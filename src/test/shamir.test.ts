@@ -9,8 +9,7 @@ const fs = FileSystemMock.getInstance();
 async function randomBytes(size: number) {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     const arr = new Uint8Array(size);
-    crypto.getRandomValues(arr);
-    return new Uint8Array(arr);
+    return crypto.getRandomValues(arr);
   }
   const { randomBytes } = await import('crypto');
   return new Uint8Array(randomBytes(size));
