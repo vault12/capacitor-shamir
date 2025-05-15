@@ -36,6 +36,7 @@ npx cap sync
 * [`restoreFromFileShards(...)`](#restorefromfileshards)
 * [`restoreFromFileShardsToData(...)`](#restorefromfileshardstodata)
 * [`restoreFileShard(...)`](#restorefileshard)
+* [Interfaces](#interfaces)
 
 </docgen-index>
 
@@ -45,15 +46,15 @@ npx cap sync
 ### generateShards(...)
 
 ```typescript
-generateShards(options: { totalShards: number; threshold: number; inputDataBase64: string; }, callback: (data?: { progress: number; shardsBase64?: string[]; }, error?: any) => void) => Promise<void>
+generateShards(options: { totalShards: number; threshold: number; inputDataBase64: string; }, callback: (data?: { progress: number; shardsBase64?: string[]; }, error?: Error) => void) => Promise<void>
 ```
 
 Splits secret data (Base64) into encrypted shards in memory.
 
-| Param          | Type                                                                                         | Description                                                         |
-| -------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; }</code>            | totalShards, threshold, and inputDataBase64 (Base64-encoded secret) |
-| **`callback`** | <code>(data?: { progress: number; shardsBase64?: string[]; }, error?: any) =&gt; void</code> | Reports progress and returns shards as Base64 strings               |
+| Param          | Type                                                                                                                | Description                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; }</code>                                   | totalShards, threshold, and inputDataBase64 (Base64-encoded secret) |
+| **`callback`** | <code>(data?: { progress: number; shardsBase64?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns shards as Base64 strings               |
 
 --------------------
 
@@ -61,15 +62,15 @@ Splits secret data (Base64) into encrypted shards in memory.
 ### restoreFromShards(...)
 
 ```typescript
-restoreFromShards(options: { inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: any) => void) => Promise<void>
+restoreFromShards(options: { inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: Error) => void) => Promise<void>
 ```
 
 Restores secret data from encrypted shards (all in memory, Base64).
 
-| Param          | Type                                                                                     | Description                                            |
-| -------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| **`options`**  | <code>{ inputShardsBase64: string[]; }</code>                                            | inputShardsBase64: array of Base64-encoded shards      |
-| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> | Reports progress and returns restored secret as Base64 |
+| Param          | Type                                                                                                            | Description                                            |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **`options`**  | <code>{ inputShardsBase64: string[]; }</code>                                                                   | inputShardsBase64: array of Base64-encoded shards      |
+| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns restored secret as Base64 |
 
 --------------------
 
@@ -77,15 +78,15 @@ Restores secret data from encrypted shards (all in memory, Base64).
 ### restoreShard(...)
 
 ```typescript
-restoreShard(options: { shardIndex: number; inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: any) => void) => Promise<void>
+restoreShard(options: { shardIndex: number; inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: Error) => void) => Promise<void>
 ```
 
 Restores a specific shard from a set of encrypted shards (all in memory, Base64).
 
-| Param          | Type                                                                                     | Description                                                |
-| -------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **`options`**  | <code>{ shardIndex: number; inputShardsBase64: string[]; }</code>                        | shardIndex and inputShardsBase64                           |
-| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> | Reports progress and returns the requested shard as Base64 |
+| Param          | Type                                                                                                            | Description                                                |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **`options`**  | <code>{ shardIndex: number; inputShardsBase64: string[]; }</code>                                               | shardIndex and inputShardsBase64                           |
+| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the requested shard as Base64 |
 
 --------------------
 
@@ -93,15 +94,15 @@ Restores a specific shard from a set of encrypted shards (all in memory, Base64)
 ### generateFileShards(...)
 
 ```typescript
-generateFileShards(options: { totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[]; }, error?: any) => void) => Promise<void>
+generateFileShards(options: { totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[]; }, error?: Error) => void) => Promise<void>
 ```
 
 Splits a file into encrypted shard files.
 
-| Param          | Type                                                                                           | Description                                                                  |
-| -------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **`options`**  | <code>{ totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }</code> | totalShards, threshold, srcPath (input file), dstPathRoot (output directory) |
-| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: any) =&gt; void</code>    | Reports progress and returns paths to shard files                            |
+| Param          | Type                                                                                                               | Description                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| **`options`**  | <code>{ totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }</code>                     | totalShards, threshold, srcPath (input file), dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns paths to shard files                            |
 
 --------------------
 
@@ -109,15 +110,15 @@ Splits a file into encrypted shard files.
 ### generateShardsToFiles(...)
 
 ```typescript
-generateShardsToFiles(options: { totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[]; }, error?: any) => void) => Promise<void>
+generateShardsToFiles(options: { totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[]; }, error?: Error) => void) => Promise<void>
 ```
 
 Splits secret data (Base64) into encrypted shard files.
 
-| Param          | Type                                                                                                   | Description                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }</code> | totalShards, threshold, inputDataBase64, dstPathRoot (output directory) |
-| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: any) =&gt; void</code>            | Reports progress and returns paths to shard files                       |
+| Param          | Type                                                                                                               | Description                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }</code>             | totalShards, threshold, inputDataBase64, dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns paths to shard files                       |
 
 --------------------
 
@@ -125,15 +126,15 @@ Splits secret data (Base64) into encrypted shard files.
 ### restoreFromFileShards(...)
 
 ```typescript
-restoreFromFileShards(options: { shardsPaths: string[]; dstPath: string; }, callback: (data?: { progress: number; dstPath?: string; }, error?: any) => void) => Promise<void>
+restoreFromFileShards(options: { shardsPaths: string[]; dstPath: string; }, callback: (data?: { progress: number; dstPath?: string; }, error?: Error) => void) => Promise<void>
 ```
 
 Restores a file from encrypted shard files.
 
-| Param          | Type                                                                                  | Description                                       |
-| -------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| **`options`**  | <code>{ shardsPaths: string[]; dstPath: string; }</code>                              | shardsPaths (input files), dstPath (output file)  |
-| **`callback`** | <code>(data?: { progress: number; dstPath?: string; }, error?: any) =&gt; void</code> | Reports progress and returns the output file path |
+| Param          | Type                                                                                                         | Description                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| **`options`**  | <code>{ shardsPaths: string[]; dstPath: string; }</code>                                                     | shardsPaths (input files), dstPath (output file)  |
+| **`callback`** | <code>(data?: { progress: number; dstPath?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the output file path |
 
 --------------------
 
@@ -141,15 +142,15 @@ Restores a file from encrypted shard files.
 ### restoreFromFileShardsToData(...)
 
 ```typescript
-restoreFromFileShardsToData(options: { shardsPaths: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: any) => void) => Promise<void>
+restoreFromFileShardsToData(options: { shardsPaths: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: Error) => void) => Promise<void>
 ```
 
 Restores secret data (Base64) from encrypted shard files.
 
-| Param          | Type                                                                                     | Description                                            |
-| -------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| **`options`**  | <code>{ shardsPaths: string[]; }</code>                                                  | shardsPaths (input files)                              |
-| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: any) =&gt; void</code> | Reports progress and returns restored secret as Base64 |
+| Param          | Type                                                                                                            | Description                                            |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **`options`**  | <code>{ shardsPaths: string[]; }</code>                                                                         | shardsPaths (input files)                              |
+| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns restored secret as Base64 |
 
 --------------------
 
@@ -157,16 +158,28 @@ Restores secret data (Base64) from encrypted shard files.
 ### restoreFileShard(...)
 
 ```typescript
-restoreFileShard(options: { shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }, callback: (data?: { progress: number; shardPath?: string; }, error?: any) => void) => Promise<void>
+restoreFileShard(options: { shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }, callback: (data?: { progress: number; shardPath?: string; }, error?: Error) => void) => Promise<void>
 ```
 
 Restores a specific shard file from a set of encrypted shard files.
 
-| Param          | Type                                                                                    | Description                                                           |
-| -------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| **`options`**  | <code>{ shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }</code>        | shardIndex, shardsPaths (input files), dstPathRoot (output directory) |
-| **`callback`** | <code>(data?: { progress: number; shardPath?: string; }, error?: any) =&gt; void</code> | Reports progress and returns the path to the restored shard file      |
+| Param          | Type                                                                                                           | Description                                                           |
+| -------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| **`options`**  | <code>{ shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }</code>                               | shardIndex, shardsPaths (input files), dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardPath?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the path to the restored shard file      |
 
 --------------------
+
+
+### Interfaces
+
+
+#### Error
+
+| Prop          | Type                |
+| ------------- | ------------------- |
+| **`name`**    | <code>string</code> |
+| **`message`** | <code>string</code> |
+| **`stack`**   | <code>string</code> |
 
 </docgen-api>

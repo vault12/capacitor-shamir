@@ -155,7 +155,6 @@ function div(a: number, b: number) {
 }
 
 function degree(p: Uint8Array) {
-  // eslint-disable-next-line no-plusplus
   for (let i = p.length - 1; i >= 1; i--) {
     if (p[i] !== 0) {
       return i;
@@ -172,12 +171,10 @@ function degree(p: Uint8Array) {
 export function interpolate(points: Uint8Array[], partIdx: number = 0) {
   const x = partIdx;
   let y = 0;
-  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < points.length; i++) {
     const aX = points[i][0];
     const aY = points[i][1];
     let li = 1;
-    // eslint-disable-next-line no-plusplus
     for (let j = 0; j < points.length; j++) {
       const bX = points[j][0];
       if (i !== j) {
@@ -217,7 +214,6 @@ export function generate(randomBytes: RandomBytes, d: number, x: number): Uint8A
  */
 export function evaluate(p: Uint8Array, x: number) {
   let result = 0;
-  // eslint-disable-next-line no-plusplus
   for (let i = p.length - 1; i >= 0; i--) {
     result = add(mul(result, x), p[i]);
   }

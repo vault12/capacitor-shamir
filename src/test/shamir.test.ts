@@ -1,7 +1,7 @@
 import '../web/base64.utils';
 import { Shamir } from '../index';
 import { FileSystemMock } from '../web/file-system.mock';
-import { beforeEach, describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { toBase64, fromBase64 } from '../web/base64.utils';
 
 const fs = FileSystemMock.getInstance();

@@ -28,10 +28,8 @@ export function split(randomBytes: RandomBytes, n: number, k: number, secret: Ui
   const values = new Array(n)
     .fill(0)
     .map(() => new Uint8Array(secret.length).fill(0));
-  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < secret.length; i++) {
     const p = generate(randomBytes, k - 1, secret[i]);
-    // eslint-disable-next-line no-plusplus
     for (let x = 1; x <= n; x++) {
       values[x - 1][i] = evaluate(p, x);
     }
@@ -72,7 +70,6 @@ export function join(parts: Parts): Uint8Array {
     const points = new Array(keys.length)
       .fill(0)
       .map(() => new Uint8Array(2).fill(0));
-    // eslint-disable-next-line no-plusplus
     for (let j = 0; j < keys.length; j++) {
       const key = keys[j];
       const k = Number(key);

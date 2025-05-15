@@ -25,7 +25,7 @@ export class IndexedDBStorage {
     await this.handleDBRequest(request, db);
   }
 
-  async getItem<T = any>(key: string): Promise<T | null> {
+  async getItem<T = unknown>(key: string): Promise<T | null> {
     const db = await this.openDB();
     const tx = db.transaction(storeName, 'readonly');
     const store = tx.objectStore(storeName);

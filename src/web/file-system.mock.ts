@@ -91,7 +91,7 @@ export class FileSystemMock {
   }
 
   private async readMockedFS() {
-    const savedFS = await this.indexedStorage.getItem(fileSystemKey);
+    const savedFS: { files: FileMockInterface[] } = await this.indexedStorage.getItem(fileSystemKey);
     this.mockedFS = savedFS ?? { files: [] as FileMockInterface[] } as MockedFS;
   }
 
