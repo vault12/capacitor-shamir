@@ -15,7 +15,7 @@ const fileSystemKey = 'mockedFS';
 
 export class FileSystemMock {
   // mock file system as an array of files
-  private mockedFS: MockedFS;
+  private mockedFS?: MockedFS;
 
   private indexedStorage: IndexedDBStorage = new IndexedDBStorage();
 
@@ -32,7 +32,7 @@ export class FileSystemMock {
     await this.ensureFSLoaded();
     path = this.removeExtraSlashes(path);
 
-    const foundFile = this.mockedFS.files.find((i) => i.path === path);
+    const foundFile = this.mockedFS!.files.find((i) => i.path === path);
     if (!foundFile) {
       throw new Error('FileSystemMock: File not found');
     }
@@ -52,7 +52,7 @@ export class FileSystemMock {
     await this.ensureFSLoaded();
     path = this.removeExtraSlashes(path);
 
-    const foundFile = this.mockedFS.files.find((i) => i.path === path);
+    const foundFile = this.mockedFS!.files.find((i) => i.path === path);
     if (foundFile) {
       if (append) {
         const currentData = fromBase64(foundFile.content);
@@ -64,7 +64,7 @@ export class FileSystemMock {
         foundFile.content = toBase64(data);
       }
     } else {
-      this.mockedFS.files.push({
+      this.mockedFS!.files.push({
         path: path,
         mtime: new Date().getTime(),
         content: toBase64(data),
@@ -77,9 +77,9 @@ export class FileSystemMock {
     await this.ensureFSLoaded();
     path = this.removeExtraSlashes(path);
 
-    const foundIndex = this.mockedFS.files.findIndex((i) => i.path === path);
+    const foundIndex = this.mockedFS!.files.findIndex((i) => i.path === path);
     if (foundIndex > -1) {
-      this.mockedFS.files.splice(foundIndex, 1);
+      this.mockedFS?.files.splice(foundIndex, 1);
     }
     await this.saveMockedFS();
   }
@@ -91,7 +91,7 @@ export class FileSystemMock {
   }
 
   private async readMockedFS() {
-    const savedFS: { files: FileMockInterface[] } = await this.indexedStorage.getItem(fileSystemKey);
+    const savedFS = await this.indexedStorage.getItem<{ files: FileMockInterface[] }>(fileSystemKey);
     this.mockedFS = savedFS ?? { files: [] as FileMockInterface[] } as MockedFS;
   }
 

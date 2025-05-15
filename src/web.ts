@@ -65,7 +65,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
 
   async generateFileShards(
     { totalShards, threshold, srcPath, dstPathRoot }: { totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; },
-    callback: (data: { progress: number, shardsPaths?: string[] }, error?: Error) => void
+    callback: (data?: { progress: number, shardsPaths?: string[] }, error?: Error) => void
   ): Promise<void> {
     const inputData = await this.fs.read(srcPath);
     const inputDataBase64 = toBase64(inputData);
@@ -81,7 +81,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         if (error) {
           reject(error);
         } else {
-          const shards = shardsBase64.map(shardBase64 => fromBase64(shardBase64));
+          const shards = shardsBase64!.map(shardBase64 => fromBase64(shardBase64));
           const id = this.generateJobId();
           const shardsPaths: string[] = [];
           for (let i = 0; i < shards.length; i++) {
@@ -105,7 +105,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         if (error) {
           reject(error);
         } else {
-          await this.fs.write(dstPath, fromBase64(dataBase64));
+          await this.fs.write(dstPath, fromBase64(dataBase64!));
           callback({ progress, dstPath });
           resolve();
         }
@@ -150,7 +150,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
         } else {
           const id = this.generateJobId();
           const shardPath = this.formatShardPath(dstPathRoot, id, shardIndex);
-          await this.fs.write(shardPath, fromBase64(dataBase64));
+          await this.fs.write(shardPath, fromBase64(dataBase64!));
           callback({ progress, shardPath });
           resolve();
         }
