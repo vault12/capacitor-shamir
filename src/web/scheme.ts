@@ -14,10 +14,10 @@ import { evaluate, generate, interpolate, Parts, RandomBytes } from './GF256';
  * recover the original secret.
  * @param  {(number) => Uint8Array} randomBytes Takes a length and returns a random
  * Uint8Array of that length
- * @param  {number} n the number of parts to produce (must be {@code >1})
- * @param  {number} k the threshold of joinable parts (must be {@code <= n})
+ * @param  {number} n the number of parts to produce (must be `>1`)
+ * @param  {number} k the threshold of joinable parts (must be `<= n`})
  * @param  {Uint8Array} secret The secret to split as an array of bytes
- * @return {{ [key: string]: Uint8Array }} an map of {@code n} parts that are arrays of bytes of the
+ * @return {Parts} an map of `n` parts that are arrays of bytes of the
  * secret length
  */
 export function split(randomBytes: RandomBytes, n: number, k: number, secret: Uint8Array): Parts {
@@ -35,7 +35,7 @@ export function split(randomBytes: RandomBytes, n: number, k: number, secret: Ui
     }
   }
 
-  const parts: { [key: string]: Uint8Array } = {};
+  const parts: Parts = {};
   for (let i = 0; i < values.length; i++) {
     const part = `${i + 1}`;
     parts[part] = values[i];
@@ -51,7 +51,7 @@ export function split(randomBytes: RandomBytes, n: number, k: number, secret: Ui
  * original secret. If the parts are incorrect, or are under the threshold value used to split the
  * secret, a random value will be returned.
  *
- * @param {{ [key: string]: Uint8Array }} parts an map of {@code n} parts that are arrays of bytes
+ * @param {Parts} parts an map of {@code n} parts that are arrays of bytes
  * of the secret length
  * @return {Uint8Array} the original secret
  *
@@ -85,7 +85,7 @@ export function join(parts: Parts): Uint8Array {
 /**
  * Restores a part given a map of parts and a new index.
  *
- * @param {{ [key: string]: Uint8Array }} parts a map of part IDs to part values
+ * @param {Parts} parts a map of part IDs to part values
  * @param {number} partIdx the new index for the part
  * @return {Uint8Array} the restored part
  * @throws {Error} if parts is empty or contains values of varying lengths
