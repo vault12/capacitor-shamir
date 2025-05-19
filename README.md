@@ -46,7 +46,7 @@ npx cap sync
 ### generateShards(...)
 
 ```typescript
-generateShards(options: { totalShards: number; threshold: number; inputDataBase64: string; }, callback: (data?: { progress: number; shardsBase64?: string[]; }, error?: Error) => void) => Promise<void>
+generateShards(options: { totalShards: number; threshold: number; inputDataBase64: string; }, callback: (data?: { progress: number; shardsBase64?: string[] | undefined; } | undefined, error?: Error | undefined) => void) => Promise<void>
 ```
 
 Splits secret data (Base64) into encrypted shards in memory.
@@ -62,7 +62,7 @@ Splits secret data (Base64) into encrypted shards in memory.
 ### restoreFromShards(...)
 
 ```typescript
-restoreFromShards(options: { inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: Error) => void) => Promise<void>
+restoreFromShards(options: { inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string | undefined; } | undefined, error?: Error | undefined) => void) => Promise<void>
 ```
 
 Restores secret data from encrypted shards (all in memory, Base64).
@@ -78,7 +78,7 @@ Restores secret data from encrypted shards (all in memory, Base64).
 ### restoreShard(...)
 
 ```typescript
-restoreShard(options: { shardIndex: number; inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: Error) => void) => Promise<void>
+restoreShard(options: { shardIndex: number; inputShardsBase64: string[]; }, callback: (data?: { progress: number; dataBase64?: string | undefined; } | undefined, error?: Error | undefined) => void) => Promise<void>
 ```
 
 Restores a specific shard from a set of encrypted shards (all in memory, Base64).
@@ -94,7 +94,7 @@ Restores a specific shard from a set of encrypted shards (all in memory, Base64)
 ### generateFileShards(...)
 
 ```typescript
-generateFileShards(options: { totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[]; }, error?: Error) => void) => Promise<void>
+generateFileShards(options: { totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[] | undefined; } | undefined, error?: Error | undefined) => void) => Promise<void>
 ```
 
 Splits a file into encrypted shard files.
@@ -110,7 +110,7 @@ Splits a file into encrypted shard files.
 ### generateShardsToFiles(...)
 
 ```typescript
-generateShardsToFiles(options: { totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[]; }, error?: Error) => void) => Promise<void>
+generateShardsToFiles(options: { totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }, callback: (data?: { progress: number; shardsPaths?: string[] | undefined; } | undefined, error?: Error | undefined) => void) => Promise<void>
 ```
 
 Splits secret data (Base64) into encrypted shard files.
@@ -126,7 +126,7 @@ Splits secret data (Base64) into encrypted shard files.
 ### restoreFromFileShards(...)
 
 ```typescript
-restoreFromFileShards(options: { shardsPaths: string[]; dstPath: string; }, callback: (data?: { progress: number; dstPath?: string; }, error?: Error) => void) => Promise<void>
+restoreFromFileShards(options: { shardsPaths: string[]; dstPath: string; }, callback: (data?: { progress: number; dstPath?: string | undefined; } | undefined, error?: Error | undefined) => void) => Promise<void>
 ```
 
 Restores a file from encrypted shard files.
@@ -142,7 +142,7 @@ Restores a file from encrypted shard files.
 ### restoreFromFileShardsToData(...)
 
 ```typescript
-restoreFromFileShardsToData(options: { shardsPaths: string[]; }, callback: (data?: { progress: number; dataBase64?: string; }, error?: Error) => void) => Promise<void>
+restoreFromFileShardsToData(options: { shardsPaths: string[]; }, callback: (data?: { progress: number; dataBase64?: string | undefined; } | undefined, error?: Error | undefined) => void) => Promise<void>
 ```
 
 Restores secret data (Base64) from encrypted shard files.
@@ -158,7 +158,7 @@ Restores secret data (Base64) from encrypted shard files.
 ### restoreFileShard(...)
 
 ```typescript
-restoreFileShard(options: { shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }, callback: (data?: { progress: number; shardPath?: string; }, error?: Error) => void) => Promise<void>
+restoreFileShard(options: { shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }, callback: (data?: { progress: number; shardPath?: string | undefined; } | undefined, error?: Error | undefined) => void) => Promise<void>
 ```
 
 Restores a specific shard file from a set of encrypted shard files.

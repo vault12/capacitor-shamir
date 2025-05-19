@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Run Lint 🔍
-        run: npm run lint
+        run: npm run eslint
 
       - name: Build Web 🌐
         run: npm run build
