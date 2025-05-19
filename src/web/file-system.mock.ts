@@ -1,3 +1,4 @@
+import { IndexedDbConfig } from '../definitions';
 import { Base64, fromBase64, toBase64 } from './base64.utils';
 import { IndexedDBStorage } from './indexeddb-storage';
 
@@ -82,6 +83,10 @@ export class FileSystemMock {
       this.mockedFS?.files.splice(foundIndex, 1);
     }
     await this.saveMockedFS();
+  }
+
+  setIndexedDbConfig(config: IndexedDbConfig) {
+    this.indexedStorage.setIndexedDbConfig(config);
   }
 
   private async ensureFSLoaded() {

@@ -1,24 +1,26 @@
-export const dbName = 'MockDb';
-export const storeName = 'MockStore';
-export const VERSION: number = 1 as const;
+import { IndexedDbConfig } from '../definitions';
 
 /**
- * simple indexedDB key-value storage.
+ * Simple IndexedDB Key-Value Storage
  *
- * indexedDB, as transactional db, has bit clunky API,
- * this service implements localStorage-like API for iDB, but wrapped in promises
+ * IndexedDB, as a transactional database, has a somewhat clunky API.
+ * This service provides a localStorage-like interface for IndexedDB, wrapped in promises.
  *
- * localstorage has very low storage limit (5MB)
- * so for development it's sometimes not enough space to save
- * all the required data for the app to work properly
- *
+ * localStorage has a very low storage limit (5MB), so during development it may not be
+ * sufficient to store all the data required for the app to function properly.
  */
 
 export class IndexedDBStorage {
+  private config: IndexedDbConfig = {
+    dbName: 'MockDb',
+    version: 1,
+    storeName: 'MockStore',
+  };
+
   async setItem<T>(key: string, data: T): Promise<void> {
     const db = await this.openDB();
-    const tx = db.transaction(storeName, 'readwrite');
-    const store = tx.objectStore(storeName);
+    const tx = db.transaction(this.config.storeName!, 'readwrite');
+    const store = tx.objectStore(this.config.storeName!);
 
     const request = store.put(data, key);
 
@@ -27,8 +29,8 @@ export class IndexedDBStorage {
 
   async getItem<T = unknown>(key: string): Promise<T | null> {
     const db = await this.openDB();
-    const tx = db.transaction(storeName, 'readonly');
-    const store = tx.objectStore(storeName);
+    const tx = db.transaction(this.config.storeName!, 'readonly');
+    const store = tx.objectStore(this.config.storeName!);
 
     const request = store.get(key);
     const result = await this.handleDBRequest(request, db);
@@ -39,14 +41,21 @@ export class IndexedDBStorage {
     return result as T;
   }
 
+  setIndexedDbConfig(config: IndexedDbConfig) {
+    this.config = {
+      ...this.config,
+      ...config,
+    };
+  }
+
   private async openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(dbName, VERSION);
+      const request = indexedDB.open(this.config.dbName!, this.config.version!);
 
       request.onupgradeneeded = () => {
         const db = request.result;
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName);
+        if (!db.objectStoreNames.contains(this.config.storeName!)) {
+          db.createObjectStore(this.config.storeName!);
         }
       };
 

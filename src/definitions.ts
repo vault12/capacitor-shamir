@@ -79,3 +79,24 @@ export interface ShamirPlugin {
     callback: (data?: { progress: number, shardPath?: string }, error?: Error) => void
   ): Promise<void>;
 }
+
+/**
+ * IndexedDB connection parameters to ensure web filesystem compatibility with Capacitor Filesystem Plugin
+ * or any other indexeddb object storage implementation.
+ */
+export interface IndexedDbConfig {
+  /**
+   * The name of the IndexedDB database.
+   */
+  dbName?: string;
+
+  /**
+   * The version of the IndexedDB database.
+   */
+  version?: number;
+
+  /**
+   * The name of the object store in the IndexedDB database.
+   */
+  storeName?: string;
+}

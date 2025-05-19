@@ -2,7 +2,7 @@ import { WebPlugin } from '@capacitor/core';
 import { FileSystemMock } from './web/file-system.mock';
 import { join, restorePart, split } from './web/scheme';
 import { Parts } from './web/GF256';
-import { ShamirPlugin } from './definitions';
+import { IndexedDbConfig, ShamirPlugin } from './definitions';
 import { fromBase64, toBase64 } from './web/base64.utils';
 
 export class ShamirWeb extends WebPlugin implements ShamirPlugin {
@@ -164,5 +164,11 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
 
   private generateJobId(): string {
     return Math.random().toString(36).substring(2, 15);
+  }
+
+  /** Web Filesystem Configuration */
+
+  setIndexedDbConfig(config: IndexedDbConfig): void {
+    this.fs.setIndexedDbConfig(config);
   }
 }
