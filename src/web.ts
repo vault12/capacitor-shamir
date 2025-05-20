@@ -168,7 +168,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
 
   /** Web Filesystem Configuration */
 
-  setIndexedDbConfig(config: IndexedDbConfig): void {
-    this.fs.setIndexedDbConfig(config);
+  updateIndexedDbConfig(config: Partial<IndexedDbConfig>) {
+    this.fs.updateIndexedDbConfig(config);
   }
 }

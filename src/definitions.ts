@@ -88,15 +88,15 @@ export interface IndexedDbConfig {
   /**
    * The name of the IndexedDB database.
    */
-  dbName?: string;
+  dbName: string;
 
   /**
    * The version of the IndexedDB database.
    */
-  version?: number;
+  version: number;
 
   /**
    * The name of the object store in the IndexedDB database.
    */
-  storeName?: string;
+  storeName: string;
 }

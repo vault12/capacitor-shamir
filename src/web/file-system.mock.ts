@@ -85,8 +85,8 @@ export class FileSystemMock {
     await this.saveMockedFS();
   }
 
-  setIndexedDbConfig(config: IndexedDbConfig) {
-    this.indexedStorage.setIndexedDbConfig(config);
+  updateIndexedDbConfig(config: Partial<IndexedDbConfig>) {
+    this.indexedStorage.updateIndexedDbConfig(config);
   }
 
   private async ensureFSLoaded() {
