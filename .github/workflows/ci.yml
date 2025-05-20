@@ -1,0 +1,68 @@
+name: build status
+on:
+  push:
+jobs:
+  build:
+    name: build and test
+    runs-on: macos-latest
+    env:
+      # Force colored output in Github Actions logs
+      FORCE_COLOR: "1"
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Install Node 🔧
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: 'npm'
+
+      - name: Install Dependencies 🔧
+        run: npm install
+
+      - name: Run Lint 🔍
+        run: npm run eslint
+
+      - name: Build Web 🌐
+        run: npm run build
+
+      - name: '[Badges] Delete remote badges branch 🔴'
+        run: git push origin --delete badges || true
+
+      - name: '[Badges] Create badges branch ➕'
+        run: git checkout -b badges
+
+      - name: Test Web 🔍
+        run: npm run test
+
+      - name: '[Badges] Generating coverage badges ⚙️'
+        uses: jpb06/coverage-badges-action@latest
+        with:
+          # TODO remove `initial-setup` before merge
+          branches: main,initial-setup
+          target-branch: badges
+
+      - name: '[Badges] Push badges branch ⬆️'
+        run: git push origin badges
+
+      - name: Build and Test iOS 🍏
+        run: npm run verify:ios
+
+      - name: Build and Test Android 🤖
+        run: npm run verify:android
+
+      - name: Send Slack message 🔔
+        # Trigger even if the job fails
+        if: always()
+        # See https://github.com/8398a7/action-slack for configuration options
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,eventName,action
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://avatars.githubusercontent.com/u/11186132?s=200&v=4
+          SLACK_COLOR: ${{ job.status }}
