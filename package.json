@@ -1,6 +1,6 @@
 {
-  "name": "capacitor-shamir",
-  "version": "1.0.2",
+  "name": "@vault12/capacitor-shamir",
+  "version": "1.0.0",
   "description": "Provides Shamir's Secret Sharing (SSS) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
