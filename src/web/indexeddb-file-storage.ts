@@ -10,35 +10,41 @@ import { IndexedDbConfig } from '../definitions';
  * sufficient to store all the data required for the app to function properly.
  */
 
-export class IndexedDBStorage {
+export class IndexedDbFileStorage<T extends { path: string }> {
+
   private config: IndexedDbConfig = {
-    dbName: 'MockDb',
+    dbName: 'Disc',
     version: 1,
-    storeName: 'MockStore',
+    storeName: 'FileStorage',
   };
 
-  async setItem<T>(key: string, data: T): Promise<void> {
+  async setItem(data: T): Promise<void> {
     const db = await this.openDB();
     const tx = db.transaction(this.config.storeName, 'readwrite');
     const store = tx.objectStore(this.config.storeName);
-
-    const request = store.put(data, key);
-
+    const request = store.put(data);
     await this.handleDBRequest(request, db);
   }
 
-  async getItem<T = unknown>(key: string): Promise<T | null> {
+  async getItem(path: string): Promise<T | null> {
     const db = await this.openDB();
     const tx = db.transaction(this.config.storeName, 'readonly');
     const store = tx.objectStore(this.config.storeName);
-
-    const request = store.get(key);
+    const request = store.get(path);
     const result = await this.handleDBRequest(request, db);
-
     if (result === undefined) {
       return null;
     }
     return result as T;
+  }
+
+  async removeItem(path: string): Promise<void> {
+    const db = await this.openDB();
+    const tx = db.transaction(this.config.storeName, 'readwrite');
+    const store = tx.objectStore(this.config.storeName);
+
+    const request = store.delete(path);
+    await this.handleDBRequest(request, db);
   }
 
   updateIndexedDbConfig(config: Partial<IndexedDbConfig>) {
@@ -55,7 +61,7 @@ export class IndexedDBStorage {
       request.onupgradeneeded = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains(this.config.storeName)) {
-          db.createObjectStore(this.config.storeName);
+          db.createObjectStore(this.config.storeName, { keyPath: 'path' });
         }
       };
 

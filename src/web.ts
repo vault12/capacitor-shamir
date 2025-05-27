@@ -168,7 +168,7 @@ export class ShamirWeb extends WebPlugin implements ShamirPlugin {
 
   /** Web Filesystem Configuration */
 
-  updateIndexedDbConfig(config: Partial<IndexedDbConfig>) {
+  updateShamirWebFsIndexedDbConfig(config: Partial<IndexedDbConfig>) {
     this.fs.updateIndexedDbConfig(config);
   }
 }
