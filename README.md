@@ -1,4 +1,4 @@
-# capacitor-shamir
+# @vault12/capacitor-shamir
 
 <!-- # TODO BEFORE MERGE: update coverage badge url to public (without token) when repo becomes public -->
 <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Github Actions Build Status" /></a>&nbsp;<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage total" /></a>
@@ -8,7 +8,7 @@ Capacitor plugin which provides [Shamir's Secret Sharing](https://en.wikipedia.o
 ## Install
 
 ```bash
-npm install capacitor-shamir
+npm install @vault12/capacitor-shamir
 npx cap sync
 ```
 
