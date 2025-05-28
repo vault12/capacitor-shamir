@@ -1,6 +1,6 @@
 import { IndexedDbConfig } from '../definitions';
 import { Base64, fromBase64, toBase64 } from './base64.utils';
-import { IndexedDBStorage } from './indexeddb-storage';
+import { IndexedDbFileStorage } from './indexeddb-file-storage';
 
 interface FileMockInterface {
   path: string;
@@ -8,17 +8,8 @@ interface FileMockInterface {
   mtime: number;
 }
 
-interface MockedFS {
-  files: Array<FileMockInterface>;
-}
-
-const fileSystemKey = 'mockedFS';
-
 export class FileSystemMock {
-  // mock file system as an array of files
-  private mockedFS?: MockedFS;
-
-  private indexedStorage: IndexedDBStorage = new IndexedDBStorage();
+  private indexedStorage: IndexedDbFileStorage<FileMockInterface> = new IndexedDbFileStorage<FileMockInterface>();
 
   private static instance: FileSystemMock;
   static getInstance() {
@@ -28,14 +19,11 @@ export class FileSystemMock {
     return FileSystemMock.instance;
   }
 
-  // returns content
   async read(path: string, offset?: number, count?: number): Promise<Uint8Array> {
-    await this.ensureFSLoaded();
     path = this.removeExtraSlashes(path);
-
-    const foundFile = this.mockedFS!.files.find((i) => i.path === path);
+    const foundFile = await this.indexedStorage.getItem(path);
     if (!foundFile) {
-      throw new Error('FileSystemMock: File not found');
+      throw new Error('[FilesystemMock] File not found');
     }
     let content = fromBase64(foundFile.content);
     // cut everything up to offset
@@ -46,62 +34,39 @@ export class FileSystemMock {
     if (count) {
       content = content.slice(undefined, count);
     }
-    return new Uint8Array(content);
+    return content;
   }
 
   async write(path: string, data: Uint8Array, append?: boolean) {
-    await this.ensureFSLoaded();
     path = this.removeExtraSlashes(path);
-
-    const foundFile = this.mockedFS!.files.find((i) => i.path === path);
-    if (foundFile) {
+    let file = await this.indexedStorage.getItem(path);
+    if (file) {
       if (append) {
-        const currentData = fromBase64(foundFile.content);
+        const currentData = fromBase64(file.content);
         const appended = new Uint8Array(currentData.length + data.length);
         appended.set(currentData);
         appended.set(data, currentData.length);
-        foundFile.content = toBase64(appended);
+        file.content = toBase64(appended);
       } else {
-        foundFile.content = toBase64(data);
+        file.content = toBase64(data);
       }
     } else {
-      this.mockedFS!.files.push({
+      file = {
         path: path,
         mtime: new Date().getTime(),
         content: toBase64(data),
-      });
+      };
     }
-    await this.saveMockedFS();
+    await this.indexedStorage.setItem(file);
   }
 
   async remove(path: string) {
-    await this.ensureFSLoaded();
     path = this.removeExtraSlashes(path);
-
-    const foundIndex = this.mockedFS!.files.findIndex((i) => i.path === path);
-    if (foundIndex > -1) {
-      this.mockedFS?.files.splice(foundIndex, 1);
-    }
-    await this.saveMockedFS();
+    await this.indexedStorage.removeItem(path);
   }
 
   updateIndexedDbConfig(config: Partial<IndexedDbConfig>) {
     this.indexedStorage.updateIndexedDbConfig(config);
-  }
-
-  private async ensureFSLoaded() {
-    if (!this.mockedFS) {
-      await this.readMockedFS();
-    }
-  }
-
-  private async readMockedFS() {
-    const savedFS = await this.indexedStorage.getItem<{ files: FileMockInterface[] }>(fileSystemKey);
-    this.mockedFS = savedFS ?? { files: [] as FileMockInterface[] } as MockedFS;
-  }
-
-  private async saveMockedFS() {
-    await this.indexedStorage.setItem(fileSystemKey, this.mockedFS);
   }
 
   private removeExtraSlashes(path: string) {

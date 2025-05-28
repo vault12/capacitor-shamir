@@ -1,6 +1,6 @@
 {
   "name": "capacitor-shamir",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Provides Shamir's Secret Sharing (SSS) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -40,7 +40,7 @@
     "test": "vitest run --coverage",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepack": "npm run build"
   },
   "devDependencies": {
     "@capacitor/android": "^7.0.0",
