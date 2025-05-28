@@ -1,7 +1,7 @@
 import Security
 
 //
-// Reference: http://www.cs.utsa.edu/~wagner/laws/FFM.html
+// Reference: https://web.archive.org/web/20180131040703/http://www.cs.utsa.edu/~wagner/laws/FFM.html
 //
 // Shamir's algorith is based on calculating points p=f(x) of polynomials
 // (shards) and solving polynomial back at point f(0) from N different
