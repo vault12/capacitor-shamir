@@ -66,6 +66,9 @@ describe('Shamir in-memory tests', () => {
 describe('Shamir file tests', () => {
 
   async function prepareFileShards() {
+    fs.updateIndexedDbConfig({
+      dbName: 'shamir-test',
+    });
     const tempDir = 'temp';
     const absSrcPath = `${tempDir}/test-shamir-file-${Math.random().toString(36)}`;
     const absRestoredPath = `${tempDir}/test-shamir-file-restored-${Math.random().toString(36)}`;
