@@ -10,11 +10,42 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ShamirCoreUnitTest {
+
+    @Test
+    public void integration() throws SimpleException {
+        final SecureRandom random = new SecureRandom();
+        for (int i = 0; i < 100; i++) {
+            // generate a random secret
+            int length = random.nextInt(10_000) + 1;      // 1..10000
+            byte[] secretBytes = new byte[length];
+            random.nextBytes(secretBytes);
+            // choose totalShards ∈ [2..10] and threshold ∈ [2..totalShards]
+            short totalShards = (short) (random.nextInt(9) + 2);
+            short threshold   = (short) (random.nextInt(totalShards - 1) + 2);
+            // split into shards
+            Map<Short, byte[]> shards = ShamirCore.split(secretBytes, totalShards, threshold, null);
+            // pick a random subset of shards to restore (size ∈ [threshold..totalShards])
+            int restoreCount = random.nextInt(totalShards - threshold + 1) + threshold;
+            List<Short> keys = new ArrayList<>(shards.keySet());
+            Collections.shuffle(keys);
+            List<Short> picked = keys.subList(0, restoreCount);
+            Map<Short, byte[]> shardsToRestore = new HashMap<>();
+            for (Short k : picked) {
+                shardsToRestore.put(k, shards.get(k));
+            }
+            // restore and verify
+            byte[] restored = ShamirCore.restore(shardsToRestore, null);
+            assertArrayEquals("Restored data does not match original", secretBytes, restored);
+        }
+    }
 
     @Test
     public void wrongShards() {

@@ -3,7 +3,30 @@ import XCTest
 @testable import ShamirPlugin
 
 class ShamirCoreTests: XCTestCase {
-
+    
+    func testIntegration() throws {
+        for _ in 1...100 {
+            // generate a random secret
+            let length = Int.random(in: 1...10000)
+            var secureBytes = [UInt8](repeating: 0, count: length)
+            let status = SecRandomCopyBytes(kSecRandomDefault, length, &secureBytes)
+            if status != errSecSuccess { throw SimpleError("ShamirCoreTests: RNG failed") }
+            let secretData = Data(secureBytes)
+            // choose totalShards ∈ [2..10] and threshold ∈ [2..totalShards]
+            let totalShards = UInt8.random(in: 2...10)
+            let threshold = UInt8.random(in: 2...totalShards)
+            // split into shards
+            let shards = try ShamirCore.split(totalShards: UInt8(totalShards), threshold: UInt8(threshold), secret: secretData)
+            // pick a random subset of shards to restore (size ∈ [threshold..totalShards])
+            let shardsToRestoreCount = Int.random(in: Int(threshold)...Int(totalShards))
+            let shardsToRestoreIndexes = Array(0..<totalShards).shuffled().prefix(shardsToRestoreCount)
+            let shardsToRestore = shardsToRestoreIndexes.map { shards[Int($0)] }
+            // restore and verify
+            let restoredData = try ShamirCore.restore(shards: shardsToRestore)
+            XCTAssertEqual(restoredData, secretData, "Restored data does not match original")
+        }
+    }
+    
     // Testing restricted parameter ranges when creating ShamirSecretSharing
     func testWrongShards() {
         XCTAssertThrowsError( try { // T too low
