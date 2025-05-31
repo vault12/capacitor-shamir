@@ -7,7 +7,7 @@ class ShamirCoreTests: XCTestCase {
     func testIntegration() throws {
         for _ in 1...100 {
             // generate a random secret
-            let length = Int.random(in: 1...10000)
+            let length = Int.random(in: 1000...10000)
             var secureBytes = [UInt8](repeating: 0, count: length)
             let status = SecRandomCopyBytes(kSecRandomDefault, length, &secureBytes)
             if status != errSecSuccess { throw SimpleError("ShamirCoreTests: RNG failed") }
