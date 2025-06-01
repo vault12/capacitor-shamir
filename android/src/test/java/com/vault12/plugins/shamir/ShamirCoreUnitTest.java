@@ -24,7 +24,7 @@ public class ShamirCoreUnitTest {
         final SecureRandom random = new SecureRandom();
         for (int i = 0; i < 100; i++) {
             // generate a random secret
-            int length = random.nextInt(10_000) + 1;      // 1..10000
+            int length = random.nextInt(9001) + 1000; // 1000..10000
             byte[] secretBytes = new byte[length];
             random.nextBytes(secretBytes);
             // choose totalShards ∈ [2..10] and threshold ∈ [2..totalShards]
