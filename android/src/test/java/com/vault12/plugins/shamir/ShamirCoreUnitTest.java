@@ -3,6 +3,7 @@ package com.vault12.plugins.shamir;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
@@ -10,11 +11,62 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ShamirCoreUnitTest {
+
+    @Test
+    public void integration() throws SimpleException {
+        final SecureRandom random = new SecureRandom();
+        for (int i = 0; i < 100; i++) {
+            // generate a random secret
+            int length = random.nextInt(9001) + 1000; // 1000..10000
+            byte[] secretBytes = new byte[length];
+            random.nextBytes(secretBytes);
+            // choose totalShards ∈ [2..10] and threshold ∈ [2..totalShards]
+            short totalShards = (short) (random.nextInt(9) + 2);
+            short threshold   = (short) (random.nextInt(totalShards - 1) + 2);
+            // split into shards
+            Map<Short, byte[]> shards = ShamirCore.split(secretBytes, totalShards, threshold, null);
+
+            for (int j = 0; j < 10; j++) {
+                // incorrect restore check
+                if (threshold > 2) {
+                    // pick a random subset of shards not enough to restore (size < threshold)
+                    int notEnoughToRestoreCount = random.nextInt(threshold - 2) + 2;
+                    List<Short> keys = new ArrayList<>(shards.keySet());
+                    Collections.shuffle(keys);
+                    List<Short> notEnoughKeys = keys.subList(0, notEnoughToRestoreCount);
+                    Map<Short, byte[]> shardsNotEnough = new HashMap<>();
+                    for (Short k : notEnoughKeys) {
+                        shardsNotEnough.put(k, shards.get(k));
+                    }
+                    // restore and verify
+                    byte[] badRestored = ShamirCore.restore(shardsNotEnough, null);
+                    assertFalse("Incorrectly restored data matched original", Arrays.equals(secretBytes, badRestored));
+                }
+
+                // correct restore check
+                // pick a random subset of shards to restore (size ∈ [threshold..totalShards])
+                int enoughToRestoreCount = random.nextInt(totalShards - threshold + 1) + threshold;
+                List<Short> keysForCorrect = new ArrayList<>(shards.keySet());
+                Collections.shuffle(keysForCorrect);
+                List<Short> enoughKeys = keysForCorrect.subList(0, enoughToRestoreCount);
+                Map<Short, byte[]> shardsEnough = new HashMap<>();
+                for (Short k : enoughKeys) {
+                    shardsEnough.put(k, shards.get(k));
+                }
+                // restore and verify
+                byte[] goodRestored = ShamirCore.restore(shardsEnough, null);
+                assertArrayEquals("Correctly restored data does not match original", secretBytes, goodRestored);
+            }
+        }
+    }
 
     @Test
     public void wrongShards() {

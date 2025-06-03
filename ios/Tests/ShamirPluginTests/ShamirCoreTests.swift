@@ -3,7 +3,44 @@ import XCTest
 @testable import ShamirPlugin
 
 class ShamirCoreTests: XCTestCase {
-
+    
+    func testIntegration() throws {
+        for _ in 1...100 {
+            // generate a random secret
+            let length = Int.random(in: 1000...10000)
+            var secureBytes = [UInt8](repeating: 0, count: length)
+            let status = SecRandomCopyBytes(kSecRandomDefault, length, &secureBytes)
+            if status != errSecSuccess { throw SimpleError("ShamirCoreTests: RNG failed") }
+            let secretData = Data(secureBytes)
+            // choose totalShards ∈ [2..10] and threshold ∈ [2..totalShards]
+            let totalShards = UInt8.random(in: 2...10)
+            let threshold = UInt8.random(in: 2...totalShards)
+            // split into shards
+            let shards = try ShamirCore.split(totalShards: UInt8(totalShards), threshold: UInt8(threshold), secret: secretData)
+            
+            for _ in 1...10 {
+                // incorrect resore check (only if threshold > 2)
+                if (threshold > 2) {
+                    // pick a random subset of shards not enough to restore (size < threshold)
+                    let shardsNotEnoughToRestoreCount = Int.random(in: Int(2)..<Int(threshold))
+                    let shardsNotEnoughToRestoreIndexes = Array(0..<totalShards).shuffled().prefix(shardsNotEnoughToRestoreCount)
+                    let shardsNotEnoughToRestore = shardsNotEnoughToRestoreIndexes.map { shards[Int($0)] }
+                    // restore and verify
+                    let incorrectRestoredData = try ShamirCore.restore(shards: shardsNotEnoughToRestore)
+                    XCTAssertNotEqual(incorrectRestoredData, secretData, "Incorrectly restored data does match original")
+                }
+                // correct restore check
+                // pick a random subset of shards to restore (size ∈ [threshold..totalShards])
+                let shardsEnoughToRestoreCount = Int.random(in: Int(threshold)...Int(totalShards))
+                let shardsEnoughToRestoreIndexes = Array(0..<totalShards).shuffled().prefix(shardsEnoughToRestoreCount)
+                let shardsEnoughToRestore = shardsEnoughToRestoreIndexes.map { shards[Int($0)] }
+                // restore and verify
+                let correctRestoredData = try ShamirCore.restore(shards: shardsEnoughToRestore)
+                XCTAssertEqual(correctRestoredData, secretData, "Correctly restored data does not match original")
+            }
+        }
+    }
+    
     // Testing restricted parameter ranges when creating ShamirSecretSharing
     func testWrongShards() {
         XCTAssertThrowsError( try { // T too low
