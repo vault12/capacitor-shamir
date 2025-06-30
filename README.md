@@ -78,13 +78,25 @@ await Shamir.generateShards({
 
 ### Overview
 
-- Implementation contains memory-based and filesystem-bases API methods for:
-  - splitting the secret data into encrypted shards;
-  - restoring secred data from encrypted shards;
-  - restoring N-th secret shard from encrypted shards.
-- All methods are callback-based to ensure continuous progress reporting.
-- Job is considered done when returned `data` object in callback contains truthy value of result property - `dataBase64`, `shardsBase64`, `shardsPath`, `shardsPaths`, `dstPath`. Progress should be used for displaying job progress only and should not be used to track job finish. In other words, consider job done when `!!dataBase64` but not when `progress === 100`.
-- Since Capacitor doesn't support passing blob data, Base64 strings are used instead.
+This plugin provides both **memory-based** and **file-based** API methods for:
+- **Splitting** secret data into encrypted shards
+- **Restoring** secret data from encrypted shards
+- **Recovering** individual N-th secret shard from a set of encrypted shards
+
+#### Key Implementation Details
+
+**Progress Reporting**: All methods use callback-based progress reporting to provide real-time updates during operations.
+
+**Job Completion**: A job is complete when the callback's `data` object contains a result property with a truthy value:
+- `dataBase64` - for restored secret data
+- `shardsBase64` - for generated shards in memory
+- `shardsPath` / `shardsPaths` - for file-based operations
+- `dstPath` - for file restoration
+
+> [!IMPORTANT]
+> Use `progress` only for UI updates, not to detect completion. A job is done when `!!dataBase64` (or other result property), not when `progress === 100`.
+
+**Data Format**: Since Capacitor doesn't support blob data transfer, all data exchange uses Base64 encoded strings.
 
 ## Methods
 
