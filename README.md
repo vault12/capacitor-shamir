@@ -248,3 +248,74 @@ Restores a specific shard file from a set of encrypted shard files.
 
 ## License
 This plugin is released under the [MIT License](http://opensource.org/licenses/MIT).
+
+
+## 🧪 Testing
+
+```bash
+# Run unit tests
+npm run test
+
+# Run platform-specific test cases
+npm run verify:ios
+npm run verify:android
+```
+
+## 📱 Platform Support
+
+| Platform | Version | Status |
+|----------|---------|--------|
+| **iOS** | 14.0+ | ✅ Fully supported |
+| **Android** | API 23+ | ✅ Fully supported |
+| **Web** | Modern browsers | ✅ Fully supported |
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/vault12/capacitor-shamir.git
+cd capacitor-shamir
+
+# Install dependencies
+npm install
+
+# Build the plugin
+npm run build
+
+# Run tests
+npm test
+```
+
+### Code Style
+
+We use ESLint and Prettier for code formatting. Please run:
+
+```bash
+npm run lint
+```
+
+## 📝 Changelog
+
+See [Releases](https://github.com/vault12/capacitor-shamir/releases) for detailed changelog.
+
+## 🙏 Acknowledgments
+
+- Finite field mathematics implementation based on [*The Laws of Cryptography: The Finite Field GF(28)* by Neal R. Wagner](https://web.archive.org/web/20180131040703/http://www.cs.utsa.edu/~wagner/laws/FFM.html)
+- Built for [Capacitor](https://capacitorjs.com/) framework
+- Implements [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) algorithm
+
+- Inspired by the need for secure, distributed secret storage
+
+## 📞 Support
+
+- 🐛 [Issue Tracker](https://github.com/vault12/capacitor-shamir/issues)
+
+---
+
+<p align="center">
+  Made with ❤️ by the <a href="https://github.com/vault12">Vault12 Team</a>
+</p>
