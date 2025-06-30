@@ -1,23 +1,77 @@
-# capacitor-shamir
+# 🔐 capacitor-shamir
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/eed959d4-66fc-485d-9467-8fb1c57b9357"
     alt="Capacitor Shamir">
 </p>
 
-<a href="https://github.com/vault12/capacitor-shamir/releases"><img src="https://img.shields.io/npm/v/capacitor-shamir" alt="NPM Release" /></a>
-<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Github Actions Build Status" /></a>
-<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage total" /></a>
-<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" /></a>
-<a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" /></a>
+<p align="center">
+  <strong>A powerful Capacitor plugin for secure secret sharing using Shamir's Secret Sharing algorithm</strong>
+</p>
 
-Capacitor plugin which provides [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.
+<p align="center">
+  <a href="https://github.com/vault12/capacitor-shamir/releases"><img src="https://img.shields.io/npm/v/capacitor-shamir" alt="NPM Release" /></a>
+  <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Build Status" /></a>
+  <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" /></a>
+  <a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" /></a>
+  <a href="https://www.npmjs.com/package/capacitor-shamir"><img src="https://img.shields.io/npm/dm/capacitor-shamir" alt="Downloads" /></a>
+</p>
 
-## Install
+---
+
+## 🎯 What is Shamir's Secret Sharing?
+
+[Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) is a cryptographic algorithm that divides a secret into multiple parts (shards), where a minimum threshold of shards is required to reconstruct the original secret. This ensures that:
+
+- **No single shard** reveals any information about the secret
+- **Any threshold number** of shards can reconstruct the secret
+- **Security through distribution** - store shards separately for maximum security
+
+## ✨ Features
+
+- 🔒 **Secure Secret Splitting**: Split sensitive data into encrypted shards using Shamir's Secret Sharing
+- 📱 **Cross-Platform**: Native support for iOS, Android, and Web
+- 💾 **Flexible Storage**: Memory-based and filesystem-based operations
+- 📊 **Progress Tracking**: Real-time progress callbacks for all operations
+- 🚀 **Performance Optimized**: Efficient handling of large files and data
+- 🔄 **Recovery Options**: Restore complete secrets or individual shards
+
+## 📦 Installation
 
 ```bash
 npm install capacitor-shamir
 npx cap sync
+```
+
+### Platform Quirks
+
+#### Web
+The web implementation uses [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for file operations and includes all necessary polyfills.
+
+## 🚀 Quick Start
+
+```typescript
+import { Shamir } from 'capacitor-shamir';
+
+// Split a secret into 5 shards, requiring 3 to reconstruct
+const secret = btoa("My secret data");
+await Shamir.generateShards({
+  totalShards: 5,
+  threshold: 3,
+  inputDataBase64: secret
+}, (data, error) => {
+  if (error) {
+    console.error('Error:', error);
+    return;
+  }
+
+  if (data?.shardsBase64) {
+    console.log('Secret split into shards:', data.shardsBase64);
+  } else {
+    console.log('Progress:', data?.progress + '%');
+  }
+});
 ```
 
 ## API
