@@ -1,24 +1,14 @@
 # capacitor-shamir
 
-<a href="https://github.com/vault12/capacitor-shamir/releases">
-  <img src="https://img.shields.io/github/release/vault12/capacitor-shamir.svg" alt="NPM Release" />
-</a>
-
-<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml">
-  <img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Github Actions Build Status" />
-</a>
-
-<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml">
-  <img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage total" />
-</a>
-
-<a href="https://opensource.org/licenses/MIT">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" />
-</a>
-
-<a href="http://makeapullrequest.com">
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" />
-</a>
+<a href="https://github.com/vault12/capacitor-shamir/releases"><img src="https://img.shields.io/npm/v/capacitor-shamir" alt="NPM Release" /></a>
+&nbsp;
+<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Github Actions Build Status" /></a>
+&nbsp;
+<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage total" /></a>
+&nbsp;
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" /></a>
+&nbsp;
+<a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" /></a>
 
 Capacitor plugin which provides [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.
 
