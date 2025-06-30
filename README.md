@@ -74,7 +74,7 @@ await Shamir.generateShards({
 });
 ```
 
-## API
+## API Reference
 
 ### Overview
 
@@ -87,6 +87,14 @@ await Shamir.generateShards({
 - Since Capacitor doesn't support passing blob data, Base64 strings are used instead.
 
 ## Methods
+
+### Method Categories
+
+| Category | Methods | Description |
+|----------|---------|-------------|
+| **Memory Operations** | `generateShards`, `restoreFromShards`, `restoreShard` | Work with Base64 data in memory |
+| **File Operations** | `generateFileShards`, `restoreFromFileShards`, `restoreFileShard` | Direct file-to-file operations |
+| **Hybrid Operations** | `generateShardsToFiles`, `restoreFromFileShardsToData` | Convert between memory and file formats |
 
 <docgen-index>
 
@@ -249,6 +257,20 @@ Restores a specific shard file from a set of encrypted shard files.
 ## License
 This plugin is released under the [MIT License](http://opensource.org/licenses/MIT).
 
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+**Large File Performance**
+- For files > 10MB, consider using file-based operations instead of memory-based
+- Monitor progress callbacks to provide user feedback during long operations
+
+**Base64 Encoding**
+- Remember to encode/decode data properly when working with binary content
+
+**Platform Differences**
+- File paths vary between platforms - use absolute paths when possible
+- iOS sandbox restrictions may limit file access locations
 
 ## 🧪 Testing
 
@@ -307,8 +329,6 @@ See [Releases](https://github.com/vault12/capacitor-shamir/releases) for detaile
 - Finite field mathematics implementation based on [*The Laws of Cryptography: The Finite Field GF(28)* by Neal R. Wagner](https://web.archive.org/web/20180131040703/http://www.cs.utsa.edu/~wagner/laws/FFM.html)
 - Built for [Capacitor](https://capacitorjs.com/) framework
 - Implements [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) algorithm
-
-- Inspired by the need for secure, distributed secret storage
 
 ## 📞 Support
 
