@@ -79,9 +79,9 @@ await Shamir.generateShards({
 ### Overview
 
 This plugin provides both **memory-based** and **file-based** API methods for:
-- **Splitting** secret data into encrypted shards
-- **Restoring** secret data from encrypted shards
-- **Recovering** individual N-th secret shard from a set of encrypted shards
+- **Splitting** secret data into cryptographic shards
+- **Restoring** secret data from cryptographic shards
+- **Recovering** individual N-th shard from a set of cryptographic shards
 
 ### Key Implementation Details
 
@@ -102,7 +102,7 @@ A job is complete when the callback's `data` object contains a result property w
 
 #### Data Format
 
-Since Capacitor doesn't support blob data transfer, all data exchange uses Base64 encoded strings.
+Since Capacitor doesn't support blob data transfer, all data exchange uses Base64-encoded strings.
 
 ## Methods
 
