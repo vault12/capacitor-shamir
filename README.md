@@ -83,11 +83,15 @@ This plugin provides both **memory-based** and **file-based** API methods for:
 - **Restoring** secret data from encrypted shards
 - **Recovering** individual N-th secret shard from a set of encrypted shards
 
-#### Key Implementation Details
+### Key Implementation Details
 
-**Progress Reporting**: All methods use callback-based progress reporting to provide real-time updates during operations.
+#### Progress Reporting
 
-**Job Completion**: A job is complete when the callback's `data` object contains a result property with a truthy value:
+All methods use callback-based progress reporting to provide real-time updates during operations.
+
+#### Job Completion
+
+A job is complete when the callback's `data` object contains a result property with a truthy value:
 - `dataBase64` - for restored secret data
 - `shardsBase64` - for generated shards in memory
 - `shardsPath` / `shardsPaths` - for file-based operations
@@ -96,11 +100,11 @@ This plugin provides both **memory-based** and **file-based** API methods for:
 > [!IMPORTANT]
 > Use `progress` only for UI updates, not to detect completion. A job is done when `!!dataBase64` (or other result property), not when `progress === 100`.
 
-**Data Format**: Since Capacitor doesn't support blob data transfer, all data exchange uses Base64 encoded strings.
+#### Data Format
+
+Since Capacitor doesn't support blob data transfer, all data exchange uses Base64 encoded strings.
 
 ## Methods
-
-### Method Categories
 
 | Category | Methods | Description |
 |----------|---------|-------------|
