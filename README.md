@@ -46,6 +46,9 @@ npx cap sync
 
 ### Platform Quirks
 
+#### Requirements
+This plugin requires **Capacitor 7.0.0 or higher**.
+
 #### Web
 The web implementation uses [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for file operations and includes all necessary polyfills.
 
@@ -342,6 +345,7 @@ See [Releases](https://github.com/vault12/capacitor-shamir/releases) for detaile
 
 ## 🙏 Acknowledgments
 
+- Web implementation includes code derived from [simbo1905/shamir](https://github.com/simbo1905/shamir) under the Apache License 2.0
 - Finite field mathematics implementation based on [*The Laws of Cryptography: The Finite Field GF(28)* by Neal R. Wagner](https://web.archive.org/web/20180131040703/http://www.cs.utsa.edu/~wagner/laws/FFM.html)
 - Built for [Capacitor](https://capacitorjs.com/) framework
 - Implements [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) algorithm
