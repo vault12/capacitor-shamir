@@ -37,6 +37,10 @@
 - 🚀 **Performance Optimized**: Efficient handling of large files and data
 - 🔄 **Recovery Options**: Restore complete secrets or individual shards
 
+## 🏆 Real-World Usage
+
+This plugin is actively used in production by **[Vault12 Guard](https://vault12.com)** - a mobile app that provides secure, decentralized backup and recovery for crypto seed phrases and other sensitive data using Shamir's Secret Sharing.
+
 ## 📦 Installation
 
 ```bash
