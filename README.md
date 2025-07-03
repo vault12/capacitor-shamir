@@ -343,14 +343,6 @@ npm run build
 npm test
 ```
 
-### Code Style
-
-We use ESLint and Prettier for code formatting. Please run:
-
-```bash
-npm run lint
-```
-
 ## 📝 Changelog
 
 See [Releases](https://github.com/vault12/capacitor-shamir/releases) for detailed changelog.
