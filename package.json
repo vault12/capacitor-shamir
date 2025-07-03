@@ -15,7 +15,7 @@
     "CapacitorShamir.podspec"
   ],
   "author": "Vault12, Inc",
-  "license": "MIT",
+  "license": "(MIT OR Apache-2.0)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vault12/capacitor-shamir.git"

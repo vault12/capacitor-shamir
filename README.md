@@ -13,7 +13,7 @@
   <a href="https://github.com/vault12/capacitor-shamir/releases"><img src="https://img.shields.io/npm/v/capacitor-shamir" alt="NPM Release" /></a>
   <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Build Status" /></a>
   <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage" /></a>
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg" alt="Dual License: MIT OR Apache-2.0" /></a>
   <a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" /></a>
   <a href="https://www.npmjs.com/package/capacitor-shamir"><img src="https://img.shields.io/npm/dm/capacitor-shamir" alt="Downloads" /></a>
 </p>
@@ -286,7 +286,12 @@ Restores a specific shard file from a set of encrypted shard files.
 </docgen-api>
 
 ## License
-This plugin is released under the [MIT License](http://opensource.org/licenses/MIT).
+
+This project is dual-licensed under **MIT OR Apache-2.0**. You may choose to use this project under the terms of either license.
+
+This dual licensing approach is necessary because the web implementation includes code derived from [simbo1905/shamir](https://github.com/simbo1905/shamir), which is licensed under the Apache License 2.0.
+
+See the [LICENSE](LICENSE) file for the full legal text.
 
 ## 🛠️ Troubleshooting
 
