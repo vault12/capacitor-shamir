@@ -28,6 +28,14 @@
 - **Any threshold number** of shards can reconstruct the secret
 - **Security through distribution** - store shards separately for maximum security
 
+### Security
+
+Shamir's Secret Sharing provides **information-theoretic security**, which means the algorithm is mathematically proven to be unbreakable regardless of computational power. Key security advantages:
+
+- **Quantum Resistance**: Security relies on mathematical impossibility rather than computational complexity, remaining secure against quantum computers
+- **No Key Management**: There is no single master key to rotate or protect; instead, security hinges on distributing and safeguarding the individual shares
+- **Mathematical Foundation**: Based on [polynomial interpolation over finite fields](#finite-field-implementation), where reconstructing the secret without sufficient shards is mathematically impossible, not just computationally difficult
+
 ## ✨ Features
 
 - 🔒 **Secure Secret Splitting**: Split sensitive data into encrypted shards using Shamir's Secret Sharing
@@ -349,8 +357,10 @@ See [Releases](https://github.com/vault12/capacitor-shamir/releases) for detaile
 
 ## 🙏 Acknowledgments
 
+<a id="finite-field-implementation"></a>
+
 - Web implementation includes code derived from [simbo1905/shamir](https://github.com/simbo1905/shamir) under the Apache License 2.0
-- Finite field mathematics implementation based on [*The Laws of Cryptography: The Finite Field GF(28)* by Neal R. Wagner](https://web.archive.org/web/20180131040703/http://www.cs.utsa.edu/~wagner/laws/FFM.html)
+- Finite field mathematics implementation based on [*The Laws of Cryptography: The Finite Field GF(2<sup>8</sup>)* by Neal R. Wagner](https://web.archive.org/web/20180131040703/http://www.cs.utsa.edu/~wagner/laws/FFM.html)
 - Built for [Capacitor](https://capacitorjs.com/) framework
 - Implements [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) algorithm
 
