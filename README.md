@@ -1,29 +1,131 @@
 # capacitor-shamir
 
-<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Github Actions Build Status" /></a>&nbsp;<a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage total" /></a>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/eed959d4-66fc-485d-9467-8fb1c57b9357"
+    alt="Capacitor Shamir">
+</p>
 
-Capacitor plugin which provides [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.
+<p align="center">
+  <strong>A powerful Capacitor plugin for secure secret sharing using Shamir's Secret Sharing algorithm</strong>
+</p>
 
-## Install
+<p align="center">
+  <a href="https://github.com/vault12/capacitor-shamir/releases"><img src="https://img.shields.io/npm/v/capacitor-shamir" alt="NPM Release" /></a>
+  <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml/badge.svg" alt="Build Status" /></a>
+  <a href="https://github.com/vault12/capacitor-shamir/actions/workflows/ci.yml"><img src="https://github.com/vault12/capacitor-shamir/blob/badges/badges/coverage-total.svg" alt="Coverage" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT%20OR%20Apache--2.0-blue.svg" alt="Dual License: MIT OR Apache-2.0" /></a>
+  <a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" /></a>
+  <a href="https://www.npmjs.com/package/capacitor-shamir"><img src="https://img.shields.io/npm/dm/capacitor-shamir" alt="Downloads" /></a>
+</p>
+
+---
+
+## 🎯 What is Shamir's Secret Sharing?
+
+[Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) is a cryptographic algorithm that divides a secret into multiple parts (shards), where a minimum threshold of shards is required to reconstruct the original secret. This ensures that:
+
+- **No single shard** reveals any information about the secret
+- **Any threshold number** of shards can reconstruct the secret
+- **Security through distribution** - store shards separately for maximum security
+
+### Security
+
+Shamir's Secret Sharing provides **information-theoretic security**, which means the algorithm is mathematically proven to be unbreakable regardless of computational power. Key security advantages:
+
+- **Quantum Resistance**: Security relies on mathematical impossibility rather than computational complexity, remaining secure against quantum computers
+- **No Key Management**: There is no single master key to rotate or protect; instead, security hinges on distributing and safeguarding the individual shares
+- **Mathematical Foundation**: Based on [polynomial interpolation over finite fields](#finite-field-implementation), where reconstructing the secret without sufficient shards is mathematically impossible, not just computationally difficult
+
+## ✨ Features
+
+- **Secure Secret Splitting**: Split sensitive data into encrypted shards using Shamir's Secret Sharing
+- **Cross-Platform**: Native support for iOS, Android, and Web
+- **Flexible Storage**: Memory-based and filesystem-based operations
+- **Progress Tracking**: Real-time progress callbacks for all operations
+- **Performance Optimized**: Efficient handling of large files and data
+- **Recovery Options**: Restore complete secrets or individual shards
+
+## 🏆 Real-World Usage
+
+This plugin is actively used in production by **[Vault12 Guard](https://vault12.com)** - a mobile app that provides secure, decentralized backup and recovery for crypto seed phrases and other sensitive data using Shamir's Secret Sharing.
+
+## 📦 Installation
 
 ```bash
 npm install capacitor-shamir
 npx cap sync
 ```
 
-## API
+### Platform Quirks
+
+#### Requirements
+This plugin requires **Capacitor 7 or higher**.
+
+#### Web
+The web implementation uses [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for file operations and includes all necessary polyfills.
+
+## 🚀 Quick Start
+
+```typescript
+import { Shamir } from 'capacitor-shamir';
+
+// Split a secret into 5 shards, requiring 3 to reconstruct
+const secret = btoa("My secret data");
+await Shamir.generateShards({
+  totalShards: 5,
+  threshold: 3,
+  inputDataBase64: secret
+}, (data, error) => {
+  if (error) {
+    console.error('Error:', error);
+    return;
+  }
+
+  if (data?.shardsBase64) {
+    console.log('Secret split into shards:', data.shardsBase64);
+  } else {
+    console.log('Progress:', data?.progress + '%');
+  }
+});
+```
+
+## API Reference
 
 ### Overview
 
-- Implementation contains memory-based and filesystem-bases API methods for:
-  - splitting the secret data into encrypted shards;
-  - restoring secred data from encrypted shards;
-  - restoring N-th secret shard from encrypted shards.
-- All methods are callback-based to ensure continuous progress reporting.
-- Job is considered done when returned `data` object in callback contains truthy value of result property - `dataBase64`, `shardsBase64`, `shardsPath`, `shardsPaths`, `dstPath`. Progress should be used for displaying job progress only and should not be used to track job finish. In other words, consider job done when `!!dataBase64` but not when `progress === 100`.
-- Since Capacitor doesn't support passing blob data, Base64 strings are used instead.
+This plugin provides both **memory-based** and **file-based** API methods for:
+- **Splitting** secret data into cryptographic shards
+- **Restoring** secret data from cryptographic shards
+- **Recovering** individual N-th shard from a set of cryptographic shards
+
+### Key Implementation Details
+
+#### Progress Reporting
+
+All methods use callback-based progress reporting to provide real-time updates during operations.
+
+#### Job Completion
+
+A job is complete when the callback's `data` object contains a result property with a truthy value:
+- `dataBase64` - for restored secret data
+- `shardsBase64` - for generated shards in memory
+- `shardsPath` / `shardsPaths` - for file-based operations
+- `dstPath` - for file restoration
+
+> [!IMPORTANT]
+> Use `progress` only for UI updates, not to detect completion. A job is done when `!!dataBase64` (or other result property), not when `progress === 100`.
+
+#### Data Format
+
+Since Capacitor doesn't support blob data transfer, all data exchange uses Base64-encoded strings.
 
 ## Methods
+
+| Category | Methods | Description |
+|----------|---------|-------------|
+| **Memory Operations** | `generateShards`, `restoreFromShards`, `restoreShard` | Work with Base64 data in memory |
+| **File Operations** | `generateFileShards`, `restoreFromFileShards`, `restoreFileShard` | Direct file-to-file operations |
+| **Hybrid Operations** | `generateShardsToFiles`, `restoreFromFileShardsToData` | Convert between memory and file formats |
 
 <docgen-index>
 
@@ -50,10 +152,10 @@ generateShards(options: { totalShards: number; threshold: number; inputDataBase6
 
 Splits secret data (Base64) into encrypted shards in memory.
 
-| Param          | Type                                                                                                                | Description                                                         |
-| -------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; }</code>                                   | totalShards, threshold, and inputDataBase64 (Base64-encoded secret) |
-| **`callback`** | <code>(data?: { progress: number; shardsBase64?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns shards as Base64 strings               |
+| Param          | Type                                                                                                                | Description                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; }</code>                                   | totalShards (≤255), threshold (≥2, ≤255), and inputDataBase64 (Base64-encoded secret) |
+| **`callback`** | <code>(data?: { progress: number; shardsBase64?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns shards as Base64 strings                                 |
 
 --------------------
 
@@ -84,7 +186,7 @@ Restores a specific shard from a set of encrypted shards (all in memory, Base64)
 
 | Param          | Type                                                                                                            | Description                                                |
 | -------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **`options`**  | <code>{ shardIndex: number; inputShardsBase64: string[]; }</code>                                               | shardIndex and inputShardsBase64                           |
+| **`options`**  | <code>{ shardIndex: number; inputShardsBase64: string[]; }</code>                                               | shardIndex (&gt;0, ≤255) and inputShardsBase64             |
 | **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the requested shard as Base64 |
 
 --------------------
@@ -98,10 +200,10 @@ generateFileShards(options: { totalShards: number; threshold: number; srcPath: s
 
 Splits a file into encrypted shard files.
 
-| Param          | Type                                                                                                               | Description                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| **`options`**  | <code>{ totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }</code>                     | totalShards, threshold, srcPath (input file), dstPathRoot (output directory) |
-| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns paths to shard files                            |
+| Param          | Type                                                                                                               | Description                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| **`options`**  | <code>{ totalShards: number; threshold: number; srcPath: string; dstPathRoot: string; }</code>                     | totalShards (≤255), threshold (≥2, ≤255), srcPath (input file), dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns paths to shard files                                              |
 
 --------------------
 
@@ -114,10 +216,10 @@ generateShardsToFiles(options: { totalShards: number; threshold: number; inputDa
 
 Splits secret data (Base64) into encrypted shard files.
 
-| Param          | Type                                                                                                               | Description                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }</code>             | totalShards, threshold, inputDataBase64, dstPathRoot (output directory) |
-| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns paths to shard files                       |
+| Param          | Type                                                                                                               | Description                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| **`options`**  | <code>{ totalShards: number; threshold: number; inputDataBase64: string; dstPathRoot: string; }</code>             | totalShards (≤255), threshold (≥2, ≤255), inputDataBase64, dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardsPaths?: string[]; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns paths to shard files                                         |
 
 --------------------
 
@@ -162,10 +264,10 @@ restoreFileShard(options: { shardIndex: number; shardsPaths: string[]; dstPathRo
 
 Restores a specific shard file from a set of encrypted shard files.
 
-| Param          | Type                                                                                                           | Description                                                           |
-| -------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| **`options`**  | <code>{ shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }</code>                               | shardIndex, shardsPaths (input files), dstPathRoot (output directory) |
-| **`callback`** | <code>(data?: { progress: number; shardPath?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the path to the restored shard file      |
+| Param          | Type                                                                                                           | Description                                                                         |
+| -------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **`options`**  | <code>{ shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }</code>                               | shardIndex (&gt;0, ≤255), shardsPaths (input files), dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardPath?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the path to the restored shard file                    |
 
 --------------------
 
@@ -182,3 +284,89 @@ Restores a specific shard file from a set of encrypted shard files.
 | **`stack`**   | <code>string</code> |
 
 </docgen-api>
+
+## License
+
+This project is dual-licensed under **MIT OR Apache-2.0**. You may choose to use this project under the terms of either license.
+
+This dual licensing approach is necessary because the web implementation includes code derived from [simbo1905/shamir](https://github.com/simbo1905/shamir), which is licensed under the Apache License 2.0.
+
+See the [LICENSE](LICENSE) file for the full legal text.
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+**Large File Performance**
+- For files > 10MB, consider using file-based operations instead of memory-based
+- Monitor progress callbacks to provide user feedback during long operations
+
+**Base64 Encoding**
+- Remember to encode/decode data properly when working with binary content
+
+**Platform Differences**
+- File paths vary between platforms - use absolute paths when possible
+- iOS sandbox restrictions may limit file access locations
+
+## 🧪 Testing
+
+```bash
+# Run unit tests
+npm run test
+
+# Run platform-specific test cases
+npm run verify:ios
+npm run verify:android
+```
+
+## 📱 Platform Support
+
+| Platform | Version | Status |
+|----------|---------|--------|
+| **iOS** | 14.0+ | ✅ Fully supported |
+| **Android** | API 23+ | ✅ Fully supported |
+| **Web** | Modern browsers | ✅ Fully supported |
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/vault12/capacitor-shamir.git
+cd capacitor-shamir
+
+# Install dependencies
+npm install
+
+# Build the plugin
+npm run build
+
+# Run tests
+npm test
+```
+
+## 📝 Changelog
+
+See [Releases](https://github.com/vault12/capacitor-shamir/releases) for detailed changelog.
+
+## 🙏 Acknowledgments
+
+<a id="finite-field-implementation"></a>
+
+- Web implementation includes code derived from [simbo1905/shamir](https://github.com/simbo1905/shamir) under the Apache License 2.0
+- Finite field mathematics implementation based on [*The Laws of Cryptography: The Finite Field GF(2<sup>8</sup>)* by Neal R. Wagner](https://web.archive.org/web/20180131040703/http://www.cs.utsa.edu/~wagner/laws/FFM.html)
+- Built for [Capacitor](https://capacitorjs.com/) framework
+- Implements [Shamir's Secret Sharing](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) algorithm
+
+## 📞 Support
+
+- 🐛 [Issue Tracker](https://github.com/vault12/capacitor-shamir/issues)
+
+---
+
+<p align="center">
+  Made with ❤️ by the <a href="https://github.com/vault12">Vault12 Team</a>
+</p>

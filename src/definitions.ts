@@ -1,7 +1,7 @@
 export interface ShamirPlugin {
   /**
    * Splits secret data (Base64) into encrypted shards in memory.
-   * @param options totalShards, threshold, and inputDataBase64 (Base64-encoded secret)
+   * @param options totalShards (≤255), threshold (≥2, ≤255), and inputDataBase64 (Base64-encoded secret)
    * @param callback Reports progress and returns shards as Base64 strings
    */
   generateShards(
@@ -21,7 +21,7 @@ export interface ShamirPlugin {
 
   /**
    * Restores a specific shard from a set of encrypted shards (all in memory, Base64).
-   * @param options shardIndex and inputShardsBase64
+   * @param options shardIndex (>0, ≤255) and inputShardsBase64
    * @param callback Reports progress and returns the requested shard as Base64
    */
   restoreShard(
@@ -31,7 +31,7 @@ export interface ShamirPlugin {
 
   /**
    * Splits a file into encrypted shard files.
-   * @param options totalShards, threshold, srcPath (input file), dstPathRoot (output directory)
+   * @param options totalShards (≤255), threshold (≥2, ≤255), srcPath (input file), dstPathRoot (output directory)
    * @param callback Reports progress and returns paths to shard files
    */
   generateFileShards(
@@ -41,7 +41,7 @@ export interface ShamirPlugin {
 
   /**
    * Splits secret data (Base64) into encrypted shard files.
-   * @param options totalShards, threshold, inputDataBase64, dstPathRoot (output directory)
+   * @param options totalShards (≤255), threshold (≥2, ≤255), inputDataBase64, dstPathRoot (output directory)
    * @param callback Reports progress and returns paths to shard files
    */
   generateShardsToFiles(
@@ -71,7 +71,7 @@ export interface ShamirPlugin {
 
   /**
    * Restores a specific shard file from a set of encrypted shard files.
-   * @param options shardIndex, shardsPaths (input files), dstPathRoot (output directory)
+   * @param options shardIndex (>0, ≤255), shardsPaths (input files), dstPathRoot (output directory)
    * @param callback Reports progress and returns the path to the restored shard file
    */
   restoreFileShard(

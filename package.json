@@ -1,6 +1,6 @@
 {
   "name": "capacitor-shamir",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Provides Shamir's Secret Sharing (SSS) functionality for secure splitting and recovering secrets natively on iOS, Android, and Web.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -15,7 +15,7 @@
     "CapacitorShamir.podspec"
   ],
   "author": "Vault12, Inc",
-  "license": "MIT",
+  "license": "(MIT OR Apache-2.0)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vault12/capacitor-shamir.git"
@@ -27,7 +27,10 @@
     "capacitor",
     "plugin",
     "native",
-    "shamir"
+    "shamir",
+    "shamir-secret-sharing",
+    "capacitor-plugin",
+    "shamir-algorithm"
   ],
   "scripts": {
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
@@ -61,8 +64,6 @@
   "peerDependencies": {
     "@capacitor/core": ">=7.0.0"
   },
-  "prettier": "@ionic/prettier-config",
-  "swiftlint": "@ionic/swiftlint-config",
   "eslintConfig": {
     "extends": "@ionic/eslint-config/recommended"
   },
