@@ -1,4 +1,4 @@
-# 🔐 capacitor-shamir
+# capacitor-shamir
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/eed959d4-66fc-485d-9467-8fb1c57b9357"
@@ -38,12 +38,12 @@ Shamir's Secret Sharing provides **information-theoretic security**, which means
 
 ## ✨ Features
 
-- 🔒 **Secure Secret Splitting**: Split sensitive data into encrypted shards using Shamir's Secret Sharing
-- 📱 **Cross-Platform**: Native support for iOS, Android, and Web
-- 💾 **Flexible Storage**: Memory-based and filesystem-based operations
-- 📊 **Progress Tracking**: Real-time progress callbacks for all operations
-- 🚀 **Performance Optimized**: Efficient handling of large files and data
-- 🔄 **Recovery Options**: Restore complete secrets or individual shards
+- **Secure Secret Splitting**: Split sensitive data into encrypted shards using Shamir's Secret Sharing
+- **Cross-Platform**: Native support for iOS, Android, and Web
+- **Flexible Storage**: Memory-based and filesystem-based operations
+- **Progress Tracking**: Real-time progress callbacks for all operations
+- **Performance Optimized**: Efficient handling of large files and data
+- **Recovery Options**: Restore complete secrets or individual shards
 
 ## 🏆 Real-World Usage
 
@@ -59,7 +59,7 @@ npx cap sync
 ### Platform Quirks
 
 #### Requirements
-This plugin requires **Capacitor 7.0.0 or higher**.
+This plugin requires **Capacitor 7 or higher**.
 
 #### Web
 The web implementation uses [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for file operations and includes all necessary polyfills.
