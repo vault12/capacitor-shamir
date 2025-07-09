@@ -214,7 +214,7 @@ public class ShamirUtils {
                     shards.put(shardID, data);
                     index++;
                 }
-                byte[] secret = ShamirCore.restore(shards, newShardIndex, progressListener);
+                byte[] secret = ShamirCore.restore(shards, newShardIndex, null);
                 dstSource.write(secret);
                 offset = end;
                 progressListener.onProgress(1.0 * offset / srcLength);
