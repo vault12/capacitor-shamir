@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
-    "verify:ios": "xcodebuild clean build test -scheme CapacitorShamir -sdk iphonesimulator -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16'",
+    "verify:ios": "xcodebuild clean build test -scheme CapacitorShamir -sdk iphonesimulator -destination \"platform=iOS Simulator,id=$(xcrun simctl list devices iPhone available | grep -m1 -oE '[0-9A-F-]{36}')\"",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "verify:web": "npm run build && npm run test",
     "eslint": "eslint . --ext ts",

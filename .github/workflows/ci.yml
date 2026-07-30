@@ -1,6 +1,10 @@
 name: build status
+# Branch pushes only: a release tag points at a commit that already ran CI,
+# and the duplicate run raced the branch run over the shared `badges` branch.
 on:
   push:
+    branches:
+      - '**'
 jobs:
   build:
     name: build and test
