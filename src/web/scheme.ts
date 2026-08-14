@@ -46,15 +46,20 @@ export function split(randomBytes: RandomBytes, n: number, k: number, secret: Ui
 
 /**
  * Validates the IDs of the given parts. A part ID is the x coordinate of the part and must be an
- * integer in the range `1..255`.
+ * integer in the range `1..255`, written canonically.
+ *
+ * The canonical form matters: `Number()` maps `"01"`, `"1.0"`, `"+1"`, `" 1"`, `"1e0"` and `"0x1"`
+ * all to `1`, so non-canonical keys would pass the range check and then interpolate at the same x
+ * coordinate as `"1"`. Two points sharing an x make `sub(aX, bX)` zero, and `div()` returns a
+ * garbage value rather than throwing, so the reconstruction would silently produce wrong bytes.
  *
  * @param {Parts} parts a map of part IDs to part values
- * @throws {Error} if any part ID is not an integer in the range `1..255`
+ * @throws {Error} if any part ID is not a canonical integer in the range `1..255`
  */
 function validatePartIds(parts: Parts): void {
   for (const key of Object.keys(parts)) {
     const id = Number(key);
-    if (!Number.isInteger(id) || id < 1 || id > 255) {
+    if (!Number.isInteger(id) || id < 1 || id > 255 || String(id) !== key) {
       throw new Error(`Invalid part ID "${key}". Part IDs must be integers from 1 to 255 (0 is the secret, not a part)`);
     }
   }

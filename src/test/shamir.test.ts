@@ -451,6 +451,16 @@ describe('Shamir scheme coordinate validation tests', () => {
     expect(() => join(poison(parts, secret.length))).to.throw('Invalid part ID "0"');
   });
 
+  test('join rejects non-canonical part IDs that collide with an existing coordinate', () => {
+    // Number() maps all of these to 1, so they would interpolate at the same x as "1". Two points
+    // sharing an x make div() return garbage instead of throwing, silently corrupting the result.
+    for (const alias of ['01', '1.0', '+1', ' 1', '1e0', '0x1']) {
+      const { parts } = prepareParts();
+      parts[alias] = parts['1'];
+      expect(() => join(parts), alias).to.throw(`Invalid part ID "${alias}"`);
+    }
+  });
+
   test('join rejects a single part instead of returning its payload', () => {
     const { parts } = prepareParts();
     // Why this matters: with one point the Lagrange basis is 1, so join returns that part's bytes
