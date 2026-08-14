@@ -195,7 +195,7 @@ export function interpolate(points: Uint8Array[], partIdx: number = 0) {
  * @return {Uint8Array} The random polynomial with x as the fist coefficient.
  */
 export function generate(randomBytes: RandomBytes, d: number, x: number): Uint8Array {
-  let p = null;
+  let p: Uint8Array;
   // generate random polynomials until we find one of the given degree
   do {
     p = randomBytes(d + 1);
