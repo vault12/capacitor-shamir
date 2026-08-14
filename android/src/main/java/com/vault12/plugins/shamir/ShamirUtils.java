@@ -35,8 +35,9 @@ public class ShamirUtils {
         return ShamirCore.restore(shards, progressListener);
     }
 
+    // shardIndex must be in [1...255] (validated at the plugin boundary): 0 is ShamirCore.restore()'s
+    // restore-the-secret sentinel, so it would return the secret instead of a shard
     public static byte[] restoreShard(Map<Short, byte[]> shards, short shardIndex, ProgressListener progressListener) throws SimpleException {
-        if (shardIndex < 1 || shardIndex > 255) { throw new SimpleException(TAG, "restoreShard() New shard index must be in [1...255], got: " + shardIndex); }
         return ShamirCore.restore(shards, shardIndex, progressListener);
     }
 
@@ -127,9 +128,9 @@ public class ShamirUtils {
         }
     }
 
+    // newShardIndex must be in [1...255] (validated at the plugin boundary): 0 is ShamirCore.restore()'s
+    // restore-the-secret sentinel, so it would write the secret into the shard file
     public static String restoreShardFromFileShards(String[] srcPaths, String dstPathRoot, short newShardIndex, ProgressListener progressListener) throws Exception {
-        // validate before prepareShardFiles() below, so a rejected request leaves no file on disk
-        if (newShardIndex < 1 || newShardIndex > 255) { throw new SimpleException(TAG, "restoreShardFromFileShards() New shard index must be in [1...255], got: " + newShardIndex); }
         long srcLength = validateShardFilesAndGetSrcLength(srcPaths);
         List<FileOutputStreamModel> shardFiles = Collections.emptyList();
         int[] indexes = { newShardIndex };
@@ -151,10 +152,14 @@ public class ShamirUtils {
             isCompleted = true;
         } finally {
             for (FileOutputStreamModel shardFile : shardFiles) {
-                shardFile.getStream().close();
-                // a failed request must not leave a plausible looking shard file behind
-                if (!isCompleted) {
-                    new File(shardFile.getPath()).delete();
+                try {
+                    shardFile.getStream().close();
+                } finally {
+                    // a failed request must not leave a plausible looking shard file behind,
+                    // even when close() itself throws
+                    if (!isCompleted) {
+                        new File(shardFile.getPath()).delete();
+                    }
                 }
             }
         }

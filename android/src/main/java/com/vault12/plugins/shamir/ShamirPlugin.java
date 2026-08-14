@@ -1,5 +1,7 @@
 package com.vault12.plugins.shamir;
 
+import androidx.annotation.VisibleForTesting;
+
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -280,6 +282,7 @@ public class ShamirPlugin extends Plugin {
      * @return the shards keyed by their unsigned index in [1...255]
      * @throws SimpleException on invalid, reserved or repeated shard indexes
      */
+    @VisibleForTesting
     static Map<Short, byte[]> parseShardsWithIndexes(List<byte[]> shardsData) throws SimpleException {
         Map<Short, byte[]> shards = new HashMap<>();
         for (byte[] data : shardsData) {
@@ -301,6 +304,7 @@ public class ShamirPlugin extends Plugin {
      * @param data a decoded shard: an index byte followed by the shard payload
      * @return the shard index as an unsigned value in [1...255]
      */
+    @VisibleForTesting
     static short parseShardIndex(byte[] data) throws SimpleException {
         if (data == null || data.length < 2) {
             throw new SimpleException(TAG, "parseShardIndex() invalid shard data: a shard must be an index byte followed by shard data");

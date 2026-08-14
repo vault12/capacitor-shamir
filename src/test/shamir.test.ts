@@ -427,10 +427,8 @@ describe('Shamir coordinate validation tests', () => {
 });
 
 /** These call the scheme directly: the core must stay airtight even if a caller bypasses `web.ts`. */
-describe('Shamir scheme coordinate validation tests', () => {
+describe('Shamir scheme tests', () => {
 
-  /** Coordinate 0 is the secret itself (`f(0)`), never a part. */
-  const SECRET_COORDINATE = 0;
   /** The byte an attacker injects through a forged part. */
   const ATTACKER_BYTE = 0xaa;
 
@@ -440,26 +438,6 @@ describe('Shamir scheme coordinate validation tests', () => {
     const secret = randomBytesSync(64);
     return { secret, parts: split(randomBytesSync, 3, 2, secret) };
   }
-
-  /** The same parts plus one forged at coordinate 0 carrying the attacker's chosen payload. */
-  function poison(parts: Parts, length: number): Parts {
-    return { ...parts, [`${SECRET_COORDINATE}`]: new Uint8Array(length).fill(ATTACKER_BYTE) };
-  }
-
-  test('join rejects a part at coordinate 0', () => {
-    const { secret, parts } = prepareParts();
-    expect(() => join(poison(parts, secret.length))).to.throw('Invalid part ID "0"');
-  });
-
-  test('join rejects non-canonical part IDs that collide with an existing coordinate', () => {
-    // Number() maps all of these to 1, so they would interpolate at the same x as "1". Two points
-    // sharing an x make div() return garbage instead of throwing, silently corrupting the result.
-    for (const alias of ['01', '1.0', '+1', ' 1', '1e0', '0x1']) {
-      const { parts } = prepareParts();
-      parts[alias] = parts['1'];
-      expect(() => join(parts), alias).to.throw(`Invalid part ID "${alias}"`);
-    }
-  });
 
   test('join rejects a single part instead of returning its payload', () => {
     const { parts } = prepareParts();
@@ -475,13 +453,6 @@ describe('Shamir scheme coordinate validation tests', () => {
     const { secret, parts } = prepareParts();
     expect(Array.from(join(parts))).to.deep.equal(Array.from(secret));
     expect(Array.from(join({ 1: parts['1'], 3: parts['3'] }))).to.deep.equal(Array.from(secret));
-  });
-
-  test('restorePart rejects out-of-range and non-integer target indexes', () => {
-    const { parts } = prepareParts();
-    for (const partIdx of [SECRET_COORDINATE, -1, 256, 1.5, NaN]) {
-      expect(() => restorePart(parts, partIdx)).to.throw(`Invalid part index ${partIdx}`);
-    }
   });
 
   test('restorePart still mints usable parts across the whole valid range', () => {

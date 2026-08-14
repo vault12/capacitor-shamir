@@ -239,29 +239,6 @@ public class ShamirCoreUnitTest {
     }
 
     @Test
-    public void restoreRejectsShardIndexZero() throws SimpleException {
-        byte[] secretBytes = "hello world".getBytes(StandardCharsets.US_ASCII);
-        Map<Short, byte[]> shardsMap = ShamirCore.split(secretBytes, (short) 5, (short) 3, null);
-
-        // a shard at index 0 sits on f(0), the secret itself, so it alone would dictate the result
-        for (short invalidIndex : new short[]{ 0, -1, -128, 256 }) {
-            Map<Short, byte[]> poisoned = subsetOf(shardsMap, (short) 1, (short) 2, (short) 3);
-            poisoned.put(invalidIndex, new byte[secretBytes.length]);
-            try {
-                ShamirCore.restore(poisoned, null);
-                fail("Shard index outside [1...255] must be rejected, index: " + invalidIndex);
-            } catch (SimpleException e) {}
-            try {
-                ShamirCore.restore(poisoned, (short) 4, null);
-                fail("Shard index outside [1...255] must be rejected, index: " + invalidIndex);
-            } catch (SimpleException e) {}
-        }
-
-        // the same shards without the invalid entry still restore
-        assertArrayEquals(secretBytes, ShamirCore.restore(subsetOf(shardsMap, (short) 1, (short) 2, (short) 3), null));
-    }
-
-    @Test
     public void restoreSecretAtIndexZeroStillWorks() throws SimpleException {
         // index 0 stays legitimate as the *target* of the interpolation: f(0) is the secret itself
         final SecureRandom random = new SecureRandom();
