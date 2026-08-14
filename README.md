@@ -168,10 +168,10 @@ restoreFromShards(options: { inputShardsBase64: string[]; }, callback: (data?: {
 
 Restores secret data from encrypted shards (all in memory, Base64).
 
-| Param          | Type                                                                                                            | Description                                            |
-| -------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| **`options`**  | <code>{ inputShardsBase64: string[]; }</code>                                                                   | inputShardsBase64: array of Base64-encoded shards      |
-| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns restored secret as Base64 |
+| Param          | Type                                                                                                            | Description                                                             |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **`options`**  | <code>{ inputShardsBase64: string[]; }</code>                                                                   | inputShardsBase64: array of Base64-encoded shards (indexes &gt;0, ≤255) |
+| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns restored secret as Base64                  |
 
 --------------------
 
@@ -184,10 +184,10 @@ restoreShard(options: { shardIndex: number; inputShardsBase64: string[]; }, call
 
 Restores a specific shard from a set of encrypted shards (all in memory, Base64).
 
-| Param          | Type                                                                                                            | Description                                                |
-| -------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **`options`**  | <code>{ shardIndex: number; inputShardsBase64: string[]; }</code>                                               | shardIndex (&gt;0, ≤255) and inputShardsBase64             |
-| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the requested shard as Base64 |
+| Param          | Type                                                                                                            | Description                                                          |
+| -------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **`options`**  | <code>{ shardIndex: number; inputShardsBase64: string[]; }</code>                                               | shardIndex (&gt;0, ≤255) and inputShardsBase64 (indexes &gt;0, ≤255) |
+| **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the requested shard as Base64           |
 
 --------------------
 
@@ -232,10 +232,10 @@ restoreFromFileShards(options: { shardsPaths: string[]; dstPath: string; }, call
 
 Restores a file from encrypted shard files.
 
-| Param          | Type                                                                                                         | Description                                       |
-| -------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| **`options`**  | <code>{ shardsPaths: string[]; dstPath: string; }</code>                                                     | shardsPaths (input files), dstPath (output file)  |
-| **`callback`** | <code>(data?: { progress: number; dstPath?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the output file path |
+| Param          | Type                                                                                                         | Description                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| **`options`**  | <code>{ shardsPaths: string[]; dstPath: string; }</code>                                                     | shardsPaths (input files, indexes &gt;0, ≤255), dstPath (output file) |
+| **`callback`** | <code>(data?: { progress: number; dstPath?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the output file path                     |
 
 --------------------
 
@@ -250,7 +250,7 @@ Restores secret data (Base64) from encrypted shard files.
 
 | Param          | Type                                                                                                            | Description                                            |
 | -------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| **`options`**  | <code>{ shardsPaths: string[]; }</code>                                                                         | shardsPaths (input files)                              |
+| **`options`**  | <code>{ shardsPaths: string[]; }</code>                                                                         | shardsPaths (input files, indexes &gt;0, ≤255)         |
 | **`callback`** | <code>(data?: { progress: number; dataBase64?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns restored secret as Base64 |
 
 --------------------
@@ -264,10 +264,10 @@ restoreFileShard(options: { shardIndex: number; shardsPaths: string[]; dstPathRo
 
 Restores a specific shard file from a set of encrypted shard files.
 
-| Param          | Type                                                                                                           | Description                                                                         |
-| -------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **`options`**  | <code>{ shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }</code>                               | shardIndex (&gt;0, ≤255), shardsPaths (input files), dstPathRoot (output directory) |
-| **`callback`** | <code>(data?: { progress: number; shardPath?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the path to the restored shard file                    |
+| Param          | Type                                                                                                           | Description                                                                                              |
+| -------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| **`options`**  | <code>{ shardIndex: number; shardsPaths: string[]; dstPathRoot: string; }</code>                               | shardIndex (&gt;0, ≤255), shardsPaths (input files, indexes &gt;0, ≤255), dstPathRoot (output directory) |
+| **`callback`** | <code>(data?: { progress: number; shardPath?: string; }, error?: <a href="#error">Error</a>) =&gt; void</code> | Reports progress and returns the path to the restored shard file                                         |
 
 --------------------
 

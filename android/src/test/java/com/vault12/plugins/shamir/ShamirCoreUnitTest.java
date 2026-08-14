@@ -238,6 +238,73 @@ public class ShamirCoreUnitTest {
 
     }
 
+    @Test
+    public void restoreRejectsShardIndexZero() throws SimpleException {
+        byte[] secretBytes = "hello world".getBytes(StandardCharsets.US_ASCII);
+        Map<Short, byte[]> shardsMap = ShamirCore.split(secretBytes, (short) 5, (short) 3, null);
 
+        // a shard at index 0 sits on f(0), the secret itself, so it alone would dictate the result
+        for (short invalidIndex : new short[]{ 0, -1, -128, 256 }) {
+            Map<Short, byte[]> poisoned = subsetOf(shardsMap, (short) 1, (short) 2, (short) 3);
+            poisoned.put(invalidIndex, new byte[secretBytes.length]);
+            try {
+                ShamirCore.restore(poisoned, null);
+                fail("Shard index outside [1...255] must be rejected, index: " + invalidIndex);
+            } catch (SimpleException e) {}
+            try {
+                ShamirCore.restore(poisoned, (short) 4, null);
+                fail("Shard index outside [1...255] must be rejected, index: " + invalidIndex);
+            } catch (SimpleException e) {}
+        }
+
+        // the same shards without the invalid entry still restore
+        assertArrayEquals(secretBytes, ShamirCore.restore(subsetOf(shardsMap, (short) 1, (short) 2, (short) 3), null));
+    }
+
+    @Test
+    public void restoreSecretAtIndexZeroStillWorks() throws SimpleException {
+        // index 0 stays legitimate as the *target* of the interpolation: f(0) is the secret itself
+        final SecureRandom random = new SecureRandom();
+        byte[] secretBytes = new byte[25000];
+        random.nextBytes(secretBytes);
+        Map<Short, byte[]> shardsMap = ShamirCore.split(secretBytes, (short) 5, (short) 3, null);
+        Map<Short, byte[]> submap = subsetOf(shardsMap, (short) 1, (short) 3, (short) 5);
+
+        final List<Double> reportedProgress = new ArrayList<>();
+        ProgressListener progressListener = reportedProgress::add;
+
+        assertArrayEquals(secretBytes, ShamirCore.restore(submap, progressListener));
+        assertArrayEquals(secretBytes, ShamirCore.restore(submap, (short) 0, progressListener));
+        assertFalse("Progress was never reported", reportedProgress.isEmpty());
+    }
+
+    @Test
+    public void restoreWithHighShardIndexes() throws SimpleException {
+        // indexes 128...255 have the high bit set, so read as signed bytes they turn into negative
+        // shorts: the [1...255] validation must keep accepting them
+        String secret = "hello world";
+        byte[] secretBytes = secret.getBytes(StandardCharsets.US_ASCII);
+        Map<Short, byte[]> shardsMap = ShamirCore.split(secretBytes, (short) 255, (short) 3, null);
+
+        short[][] shardTriples = new short[][]{ {1, 2, 3}, {126, 127, 128}, {128, 200, 255}, {253, 254, 255} };
+        for (short[] triple : shardTriples) {
+            byte[] r = ShamirCore.restore(subsetOf(shardsMap, triple), null);
+            assertEquals("Restore failed for shard indexes " + Arrays.toString(triple), secret, new String(r, StandardCharsets.US_ASCII));
+        }
+
+        // a shard minted at a high index matches the genuine shard at that index
+        for (short newIndex : new short[]{ 127, 128, 200, 255 }) {
+            byte[] newShard = ShamirCore.restore(subsetOf(shardsMap, (short) 1, (short) 2, (short) 3), newIndex, null);
+            assertArrayEquals("Minted shard differs from the genuine one at index " + newIndex, shardsMap.get(newIndex), newShard);
+        }
+    }
+
+    private static Map<Short, byte[]> subsetOf(Map<Short, byte[]> shards, short... indexes) {
+        Map<Short, byte[]> submap = new HashMap<>();
+        for (short index : indexes) {
+            submap.put(index, shards.get(index));
+        }
+        return submap;
+    }
 
 }

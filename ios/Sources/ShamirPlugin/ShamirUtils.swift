@@ -20,6 +20,10 @@ class ShamirUtils {
     }
     
     public static func restoreShard(shards: [(UInt8, Data)], shardIndex: UInt8, onProgress: @escaping (Double) -> Void) throws -> Data {
+        // Index 0 is reserved for the secret itself, a new shard can never be minted at f(0)
+        guard shardIndex >= 1 else {
+            throw SimpleError("\(TAG) restoreShard() new shard index must be in [1...255], got \(shardIndex)")
+        }
         return try ShamirCore.restore(shards: shards, newShardIndex: shardIndex, onProgress: onProgress)
     }
     
@@ -88,6 +92,10 @@ class ShamirUtils {
     }
     
     public static func restoreShardFromFileShards(srcPaths: [String], shardIndex: UInt8, dstPathRoot: String, onProgress: (Double) -> Void) throws -> String {
+        // Index 0 is reserved; checked before prepareShardFiles() so nothing is written on rejection
+        guard shardIndex >= 1 else {
+            throw SimpleError("\(TAG) restoreShardFromFileShards() new shard index must be in [1...255], got \(shardIndex)")
+        }
         guard let srcLength = try validateSrcShardsAndGetSrcLength(srcPaths), srcLength > 0 else {
             throw SimpleError("\(TAG) restoreShardFromFileShards() srcLength is zero")
         }
@@ -95,8 +103,13 @@ class ShamirUtils {
         guard let dstFileHandle = dstFileHandles.first, let fileName = fileNames.first else {
             throw SimpleError("restoreShardFromFileShards() failed to prepare shard file")
         }
+        var isCompleted = false
         defer {
             try? dstFileHandle.close()
+            // A failed request must not leave a shard file behind
+            if !isCompleted {
+                try? FileManager.default.removeItem(atPath: fileName)
+            }
         }
         try restoreFromFileShardsToHandler(srcPaths: srcPaths, srcLength: srcLength, newShardIndex: shardIndex, writeHandler: { buffer in
             do {
@@ -105,6 +118,7 @@ class ShamirUtils {
                 throw ShamirUtils.processedError(error)
             }
         }, onProgress: onProgress)
+        isCompleted = true
         return fileName
     }
     
@@ -187,6 +201,18 @@ class ShamirUtils {
                 throw SimpleError("\(TAG) restoreFromFileShards() failed to read idx")
             }
             return data.first! as UInt8
+        }
+        // ShamirCore.restore() rejects index 0 too, this check is here only to name the offending file
+        if let zeroPosition = shardIds.firstIndex(of: 0) {
+            throw SimpleError("\(TAG) restoreFromFileShards() shard file has reserved index 0, shard indexes must be in [1...255]: \(srcPaths[zeroPosition])")
+        }
+        // A repeated index is the same threshold break at a colliding coordinate. ShamirCore.restore()
+        // rejects it too, this check is here only to name the offending file.
+        var seenIndexes = Set<UInt8>()
+        for (position, idx) in shardIds.enumerated() {
+            if !seenIndexes.insert(idx).inserted {
+                throw SimpleError("\(TAG) restoreFromFileShards() duplicate shard index \(idx), every shard file must carry its own index: \(srcPaths[position])")
+            }
         }
         let bufferSz = ShamirUtils.BufferSize
         var offset = 0

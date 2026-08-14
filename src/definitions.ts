@@ -11,7 +11,7 @@ export interface ShamirPlugin {
 
   /**
    * Restores secret data from encrypted shards (all in memory, Base64).
-   * @param options inputShardsBase64: array of Base64-encoded shards
+   * @param options inputShardsBase64: array of Base64-encoded shards (indexes >0, ≤255)
    * @param callback Reports progress and returns restored secret as Base64
    */
   restoreFromShards(
@@ -21,7 +21,7 @@ export interface ShamirPlugin {
 
   /**
    * Restores a specific shard from a set of encrypted shards (all in memory, Base64).
-   * @param options shardIndex (>0, ≤255) and inputShardsBase64
+   * @param options shardIndex (>0, ≤255) and inputShardsBase64 (indexes >0, ≤255)
    * @param callback Reports progress and returns the requested shard as Base64
    */
   restoreShard(
@@ -51,7 +51,7 @@ export interface ShamirPlugin {
 
   /**
    * Restores a file from encrypted shard files.
-   * @param options shardsPaths (input files), dstPath (output file)
+   * @param options shardsPaths (input files, indexes >0, ≤255), dstPath (output file)
    * @param callback Reports progress and returns the output file path
    */
   restoreFromFileShards(
@@ -61,7 +61,7 @@ export interface ShamirPlugin {
 
   /**
    * Restores secret data (Base64) from encrypted shard files.
-   * @param options shardsPaths (input files)
+   * @param options shardsPaths (input files, indexes >0, ≤255)
    * @param callback Reports progress and returns restored secret as Base64
    */
   restoreFromFileShardsToData(
@@ -71,7 +71,7 @@ export interface ShamirPlugin {
 
   /**
    * Restores a specific shard file from a set of encrypted shard files.
-   * @param options shardIndex (>0, ≤255), shardsPaths (input files), dstPathRoot (output directory)
+   * @param options shardIndex (>0, ≤255), shardsPaths (input files, indexes >0, ≤255), dstPathRoot (output directory)
    * @param callback Reports progress and returns the path to the restored shard file
    */
   restoreFileShard(

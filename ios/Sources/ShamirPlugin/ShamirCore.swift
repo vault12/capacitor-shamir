@@ -67,13 +67,22 @@ class ShamirCore {
     // - OR -
     // If newShardIndex is specified and > 0 - generates new shard from other shards, with the given index.
     // Returns: data object - either restored secret or new shard.
+    // Input shard indexes must be in [1...255]; newShardIndex 0 is the sentinel for "restore the secret".
     // If onProgress handler is specified, it's invoked each ProgressReportIntervalBytes bytes counter with progress and empty result.
     public static func restore(shards: [(UInt8,Data)], newShardIndex: UInt8 = 0, onProgress: ((Double) -> Void)? = nil) throws -> Data {
-        guard newShardIndex >= 0 && newShardIndex <= 255 else {
-            throw SimpleError("[ShamirCore] restore() shard index must be in [0...255]")
-        }
         if shards.count < 2 {
             throw SimpleError("[ShamirCore] restore() Need at least two Shamir's shards")
+        }
+        // Index 0 is reserved: f(0) is the secret itself
+        if let zeroPosition = shards.firstIndex(where: { $0.0 == 0 }) {
+            throw SimpleError("[ShamirCore] restore() Shard at position \(zeroPosition) has reserved index 0, shard indexes must be in [1...255]")
+        }
+        // Duplicate indexes make the Lagrange basis divide by zero and silently return garbage
+        var seenIndexes = Set<UInt8>()
+        for (idx, _) in shards {
+            if !seenIndexes.insert(idx).inserted {
+                throw SimpleError("[ShamirCore] restore() Shards have duplicate index \(idx)")
+            }
         }
         let sizes = shards.map { $0.1.count }.reduce([Int]()) { $0.contains($1) ? $0 : $0 + [$1] }
         if sizes.count != 1 {
