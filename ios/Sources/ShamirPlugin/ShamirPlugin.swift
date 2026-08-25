@@ -67,7 +67,6 @@ public class ShamirPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("\(self.TAG) restoreFromShards() invalid shard in inputShardsBase64, a shard must be an index byte followed by shard data")
                 return
             }
-            // Shard indexes are validated in ShamirCore.restore(), the single site for both restore paths
             let idx = data[0]
             // Data copying constructor is here to reset collection indices
             let shard = Data(data.suffix(from: 1))
@@ -105,7 +104,6 @@ public class ShamirPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("\(self.TAG) restoreShard() invalid shard in inputShardsBase64, a shard must be an index byte followed by shard data")
                 return
             }
-            // Shard indexes are validated in ShamirCore.restore(), the single site for both restore paths
             let idx = data[0]
             let shard = Data(data.suffix(from: 1))
             shardsWithIndexes.append((idx, shard))

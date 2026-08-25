@@ -155,8 +155,6 @@ public class ShamirUtils {
                 try {
                     shardFile.getStream().close();
                 } finally {
-                    // a failed request must not leave a plausible looking shard file behind,
-                    // even when close() itself throws
                     if (!isCompleted) {
                         new File(shardFile.getPath()).delete();
                     }

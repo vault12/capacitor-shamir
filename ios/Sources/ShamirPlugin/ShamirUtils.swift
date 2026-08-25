@@ -198,8 +198,6 @@ class ShamirUtils {
             }
             return data.first! as UInt8
         }
-        // Reserved and duplicate indexes are rejected by ShamirCore.restore() on the first chunk,
-        // its position-based message maps 1:1 to srcPaths order
         let bufferSz = ShamirUtils.BufferSize
         var offset = 0
         repeat {
