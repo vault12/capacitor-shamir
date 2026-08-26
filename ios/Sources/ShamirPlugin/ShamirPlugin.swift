@@ -62,8 +62,9 @@ public class ShamirPlugin: CAPPlugin, CAPBridgedPlugin {
         let inputShardsBase64 = call.getArray("inputShardsBase64", String.self) ?? []
         var shardsWithIndexes = [(UInt8, Data)]()
         for base64 in inputShardsBase64 {
-            guard let data = Data(base64Encoded: base64), data.count >= 1 else {
-                call.reject("\(self.TAG) restoreFromShards() invalid inputDataBase64")
+            // A shard is an index byte followed by at least one byte of shard data
+            guard let data = Data(base64Encoded: base64), data.count >= 2 else {
+                call.reject("\(self.TAG) restoreFromShards() invalid shard in inputShardsBase64, a shard must be an index byte followed by shard data")
                 return
             }
             let idx = data[0]
@@ -92,14 +93,15 @@ public class ShamirPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func restoreShard(_ call: CAPPluginCall) {
         let inputShardsBase64 = call.getArray("inputShardsBase64", String.self) ?? []
         let shardIndex = call.getInt("shardIndex", 0)
-        guard shardIndex <= 255 else {
-            call.reject("\(self.TAG) restoreShard() shardIndex should be <= 255")
+        guard shardIndex >= 1, shardIndex <= 255 else {
+            call.reject("\(self.TAG) restoreShard() shardIndex should be in [1...255], got \(shardIndex)")
             return
         }
         var shardsWithIndexes = [(UInt8, Data)]()
         for base64 in inputShardsBase64 {
-            guard let data = Data(base64Encoded: base64), data.count >= 1 else {
-                call.reject("\(self.TAG) restoreShard() invalid inputDataBase64")
+            // A shard is an index byte followed by at least one byte of shard data
+            guard let data = Data(base64Encoded: base64), data.count >= 2 else {
+                call.reject("\(self.TAG) restoreShard() invalid shard in inputShardsBase64, a shard must be an index byte followed by shard data")
                 return
             }
             let idx = data[0]
@@ -159,11 +161,11 @@ public class ShamirPlugin: CAPPlugin, CAPBridgedPlugin {
         let dstPathRoot = call.getString("dstPathRoot", "")
         let inputDataBase64 = call.getString("inputDataBase64", "")
         guard totalShards <= 255, threshold <= 255 else {
-            call.reject("\(self.TAG) generateShards() totalShards and threshold should be <= 255")
+            call.reject("\(self.TAG) generateShardsToFiles() totalShards and threshold should be <= 255")
             return
         }
         guard let inputData = Data(base64Encoded: inputDataBase64) else {
-            call.reject("\(self.TAG) generateShards() invalid inputDataBase64")
+            call.reject("\(self.TAG) generateShardsToFiles() invalid inputDataBase64")
             return
         }
         call.keepAlive = true
@@ -224,8 +226,8 @@ public class ShamirPlugin: CAPPlugin, CAPBridgedPlugin {
         let srcPaths = call.getArray("shardsPaths", String.self) ?? []
         let dstPathRoot = call.getString("dstPathRoot", "")
         let shardIndex = call.getInt("shardIndex", 0)
-        guard shardIndex <= 255 else {
-            call.reject("\(self.TAG) restoreFileShard() shardIndex should be <= 255")
+        guard shardIndex >= 1, shardIndex <= 255 else {
+            call.reject("\(self.TAG) restoreFileShard() shardIndex should be in [1...255], got \(shardIndex)")
             return
         }
         call.keepAlive = true

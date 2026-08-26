@@ -51,13 +51,17 @@ export function split(randomBytes: RandomBytes, n: number, k: number, secret: Ui
  * original secret. If the parts are incorrect, or are under the threshold value used to split the
  * secret, a random value will be returned.
  *
+ * <p>Part IDs are expected as canonical integers in the range `1..255`, validated by the caller
+ * (see `web.ts`) - this module trusts its input.
+ *
  * @param {Parts} parts an map of {@code n} parts that are arrays of bytes
  * of the secret length
  * @return {Uint8Array} the original secret
- *
+ * @throws {Error} if fewer than two parts are provided or if they contain values of varying lengths
  */
 export function join(parts: Parts): Uint8Array {
-  if (Object.keys(parts).length === 0) throw new Error('No parts provided');
+  // A single part interpolates to itself, so its payload would come back as "the secret".
+  if (Object.keys(parts).length < 2) throw new Error('Need at least two parts');
   const lengths = Object.values(parts).map(x => x.length);
   const max = Math.max.apply(null, lengths);
   const min = Math.min.apply(null, lengths);
@@ -85,10 +89,14 @@ export function join(parts: Parts): Uint8Array {
 /**
  * Restores a part given a map of parts and a new index.
  *
+ * <p>Part IDs and `partIdx` are expected as integers in the range `1..255`, validated by the
+ * caller (see `web.ts`) - this module trusts its input. `partIdx` 0 would interpolate at `f(0)`,
+ * the secret itself.
+ *
  * @param {Parts} parts a map of part IDs to part values
  * @param {number} partIdx the new index for the part
  * @return {Uint8Array} the restored part
- * @throws {Error} if parts is empty or contains values of varying lengths
+ * @throws {Error} if fewer than two parts are provided or if they contain values of varying lengths
  */
 export function restorePart(parts: Parts, partIdx: number): Uint8Array {
   if (Object.keys(parts).length <= 1) throw new Error('Need at least two parts');

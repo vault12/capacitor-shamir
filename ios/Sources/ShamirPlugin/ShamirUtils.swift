@@ -19,6 +19,8 @@ class ShamirUtils {
         return try ShamirCore.restore(shards: shards, onProgress: onProgress)
     }
     
+    // shardIndex must be >= 1 (validated at the plugin boundary): 0 is ShamirCore.restore()'s
+    // restore-the-secret sentinel, so it would return the secret instead of a shard
     public static func restoreShard(shards: [(UInt8, Data)], shardIndex: UInt8, onProgress: @escaping (Double) -> Void) throws -> Data {
         return try ShamirCore.restore(shards: shards, newShardIndex: shardIndex, onProgress: onProgress)
     }
@@ -87,6 +89,8 @@ class ShamirUtils {
         return dstBuffer
     }
     
+    // shardIndex must be >= 1 (validated at the plugin boundary): 0 is ShamirCore.restore()'s
+    // restore-the-secret sentinel, so it would write the secret into the shard file
     public static func restoreShardFromFileShards(srcPaths: [String], shardIndex: UInt8, dstPathRoot: String, onProgress: (Double) -> Void) throws -> String {
         guard let srcLength = try validateSrcShardsAndGetSrcLength(srcPaths), srcLength > 0 else {
             throw SimpleError("\(TAG) restoreShardFromFileShards() srcLength is zero")
@@ -95,8 +99,13 @@ class ShamirUtils {
         guard let dstFileHandle = dstFileHandles.first, let fileName = fileNames.first else {
             throw SimpleError("restoreShardFromFileShards() failed to prepare shard file")
         }
+        var isCompleted = false
         defer {
             try? dstFileHandle.close()
+            // A failed request must not leave a shard file behind
+            if !isCompleted {
+                try? FileManager.default.removeItem(atPath: fileName)
+            }
         }
         try restoreFromFileShardsToHandler(srcPaths: srcPaths, srcLength: srcLength, newShardIndex: shardIndex, writeHandler: { buffer in
             do {
@@ -105,6 +114,7 @@ class ShamirUtils {
                 throw ShamirUtils.processedError(error)
             }
         }, onProgress: onProgress)
+        isCompleted = true
         return fileName
     }
     

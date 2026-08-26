@@ -35,6 +35,8 @@ public class ShamirUtils {
         return ShamirCore.restore(shards, progressListener);
     }
 
+    // shardIndex must be in [1...255] (validated at the plugin boundary): 0 is ShamirCore.restore()'s
+    // restore-the-secret sentinel, so it would return the secret instead of a shard
     public static byte[] restoreShard(Map<Short, byte[]> shards, short shardIndex, ProgressListener progressListener) throws SimpleException {
         return ShamirCore.restore(shards, shardIndex, progressListener);
     }
@@ -126,10 +128,13 @@ public class ShamirUtils {
         }
     }
 
+    // newShardIndex must be in [1...255] (validated at the plugin boundary): 0 is ShamirCore.restore()'s
+    // restore-the-secret sentinel, so it would write the secret into the shard file
     public static String restoreShardFromFileShards(String[] srcPaths, String dstPathRoot, short newShardIndex, ProgressListener progressListener) throws Exception {
         long srcLength = validateShardFilesAndGetSrcLength(srcPaths);
         List<FileOutputStreamModel> shardFiles = Collections.emptyList();
         int[] indexes = { newShardIndex };
+        boolean isCompleted = false;
         try {
             shardFiles = prepareShardFiles(indexes, dstPathRoot, generateIdString());
             if (shardFiles.isEmpty()) {
@@ -144,9 +149,16 @@ public class ShamirUtils {
                 }
             };
             restoreFromFileShards(srcPaths, srcLength, newShardIndex, dstSource, progressListener);
+            isCompleted = true;
         } finally {
             for (FileOutputStreamModel shardFile : shardFiles) {
-                shardFile.getStream().close();
+                try {
+                    shardFile.getStream().close();
+                } finally {
+                    if (!isCompleted) {
+                        new File(shardFile.getPath()).delete();
+                    }
+                }
             }
         }
         return shardFiles.get(0).getPath();
@@ -160,7 +172,9 @@ public class ShamirUtils {
                 .distinct()
                 .count() == 1;
         if (!sizesAreEqual) { throw new SimpleException(TAG, "Shard files have varying sizes"); }
-        return new File(srcPaths[0]).length() - 1;
+        long srcLength = new File(srcPaths[0]).length() - 1;
+        if (srcLength <= 0) { throw new SimpleException(TAG, "Invalid shard files: a shard file must be an index byte followed by shard data"); }
+        return srcLength;
     }
 
     /**
@@ -198,7 +212,18 @@ public class ShamirUtils {
             short[] shardIds = new short[srcInputStreams.size()];
             int i = 0;
             for (FileInputStream srcInputStream : srcInputStreams) {
+                // read() gives an unsigned [0...255] index byte, or -1 on an empty shard file
                 shardIds[i] = (short) srcInputStream.read();
+                if (shardIds[i] < 1 || shardIds[i] > 255) {
+                    throw new SimpleException(TAG, "restoreFromFileShards() invalid shard index: " + shardIds[i] + ", valid shard indexes are [1...255], file: " + srcPaths[i]);
+                }
+                // Shards are keyed by their coordinate below, so a repeated index would silently
+                // evict a genuine shard and leave fewer distinct points than the caller supplied
+                for (int j = 0; j < i; j++) {
+                    if (shardIds[j] == shardIds[i]) {
+                        throw new SimpleException(TAG, "restoreFromFileShards() duplicate shard index: " + shardIds[i] + ", every shard file must carry its own index, file: " + srcPaths[i]);
+                    }
+                }
                 i++;
             }
             long offset = 0;

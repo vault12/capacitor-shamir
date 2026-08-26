@@ -66,10 +66,20 @@ public class ShamirCore {
         return map;
     }
 
+    /** Restores the original secret, i.e. interpolates the shards at f(0). */
     public static byte[] restore(Map<Short, byte[]> shards, @Nullable ProgressListener progressListener) throws SimpleException {
         return restore(shards, (short)0, progressListener);
     }
 
+    /**
+     * Restores the original secret, or mints a new shard when {@code newIndex} is greater than 0.
+     *
+     * @param shards at least two shards keyed by their x coordinate, expected as unsigned values
+     *               in [1...255] and validated where the index bytes are parsed (see
+     *               ShamirPlugin.parseShardsWithIndexes() and ShamirUtils.restoreFromFileShards())
+     * @param newIndex [1...255] mints a new shard at that index, 0 restores the secret
+     * @param progressListener optional progress reporter
+     */
     public static byte[] restore(Map<Short, byte[]> shards, short newIndex, @Nullable ProgressListener progressListener) throws SimpleException {
         if (newIndex < 0 || newIndex > 255) { throw new SimpleException(TAG, "restore() New index must be in [0...255]"); }
         if (shards.size() < 2) { throw new SimpleException(TAG, "restore() Need at least two Shamir's shards"); }

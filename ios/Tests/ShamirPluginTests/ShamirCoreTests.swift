@@ -134,4 +134,102 @@ class ShamirCoreTests: XCTestCase {
         }
     }
 
+    // Index 0 is reserved: f(0) is the secret itself, so no INPUT shard may sit at x=0
+    func testRestoreRejectsInputShardAtReservedIndex() throws {
+        let secretData = Data("hello world".utf8)
+        let shards = try ShamirCore.split(totalShards: 5, threshold: 3, secret: secretData)
+
+        // Reserved index in first, middle and last position of the input
+        for position in 0..<3 {
+            var poisoned = [(UInt8,Data)](shards[0..<3])
+            poisoned[position] = (0, poisoned[position].1)
+
+            XCTAssertThrowsError( try ShamirCore.restore(shards: poisoned) ) { error in
+                let message = errorMessage(error)
+                XCTAssertTrue( message.contains("reserved index 0"), "Unexpected error: \(message)" )
+            }
+        }
+
+        // An extra point injected at x=0 would otherwise dictate the whole reconstruction
+        var poisoned = [(UInt8,Data)](shards[0..<3])
+        poisoned.append( (0, Data("ATTACKER!!!".utf8)) )
+        XCTAssertThrowsError( try ShamirCore.restore(shards: poisoned) )
+    }
+
+    // Two points at the same coordinate are not two points: the Lagrange basis divides by zero and
+    // the reconstruction silently runs on fewer distinct points than the caller supplied
+    func testRestoreRejectsDuplicateShardIndexes() throws {
+        let secretData = Data("hello world".utf8)
+        let attackerData = Data("ATTACKER!!!".utf8)
+        XCTAssertEqual( secretData.count, attackerData.count, "Attacker payload must be shard sized" )
+
+        let shards = try ShamirCore.split(totalShards: 5, threshold: 3, secret: secretData)
+        // Control: this very shard set restores the secret
+        XCTAssertEqual( try ShamirCore.restore(shards: [(UInt8,Data)](shards[0..<3])), secretData )
+
+        // A genuine, above threshold shard set plus one forged shard reusing shard #1's coordinate
+        var poisoned = [(UInt8,Data)](shards[0..<3])
+        poisoned.append( (shards[0].0, attackerData) )
+
+        XCTAssertThrowsError( try ShamirCore.restore(shards: poisoned) ) { error in
+            let message = errorMessage(error)
+            XCTAssertTrue( message.contains("duplicate index"), "Unexpected error: \(message)" )
+            XCTAssertTrue( message.contains("\(shards[0].0)"), "Error does not name the offending index: \(message)" )
+        }
+        XCTAssertNil( try? ShamirCore.restore(shards: poisoned), "restore() accepted a duplicate shard index" )
+
+        // The same shard supplied twice is the same break, and collapses below the threshold
+        XCTAssertNil( try? ShamirCore.restore(shards: [shards[0], shards[0], shards[0]]),
+                      "restore() accepted the same shard three times" )
+        XCTAssertNil( try? ShamirCore.restore(shards: poisoned, newShardIndex: 4),
+                      "restore() accepted a duplicate shard index while minting a shard" )
+    }
+
+    // A single shard interpolates to itself, so it would come back as "the secret"
+    func testRestoreRejectsSingleShard() throws {
+        let secretData = Data("hello world".utf8)
+        let shards = try ShamirCore.split(totalShards: 5, threshold: 3, secret: secretData)
+
+        XCTAssertThrowsError( try ShamirCore.restore(shards: [shards[0]]) ) { error in
+            let message = errorMessage(error)
+            XCTAssertTrue( message.contains("at least two"), "Unexpected error: \(message)" )
+        }
+        let leaked = try? ShamirCore.restore(shards: [(7, Data("ATTACKER!!!".utf8))])
+        XCTAssertNil( leaked, "restore() returned the lone shard's payload as the secret" )
+    }
+
+    // Index 0 stays the legitimate TARGET sentinel: it means "interpolate f(0)", i.e. the secret
+    func testRestoreSecretAtIndexZeroStillWorks() throws {
+        let secretData = Data("hello world".utf8)
+        let shards = try ShamirCore.split(totalShards: 5, threshold: 3, secret: secretData)
+        let restore = [(UInt8,Data)](shards[0..<3])
+
+        XCTAssertEqual( try ShamirCore.restore(shards: restore), secretData )
+        XCTAssertEqual( try ShamirCore.restore(shards: restore, newShardIndex: 0), secretData )
+    }
+
+    // New shards at high coordinates must keep working, including >= 128
+    func testRestoreNewShardAtHighIndex() throws {
+        let secretData = Data("hello world".utf8)
+        let shards = try ShamirCore.split(totalShards: 255, threshold: 3, secret: secretData)
+        let restore = [(UInt8,Data)](shards[0..<3]) // indexes 1,2,3
+
+        for newShardIndex: UInt8 in [1, 127, 128, 200, 255] {
+            let newShard = try ShamirCore.restore(shards: restore, newShardIndex: newShardIndex)
+            // Generated shard must match the shard we kept as control
+            XCTAssertEqual( newShard, shards[Int(newShardIndex) - 1].1,
+                            "New shard at index \(newShardIndex) does not match the genuine one" )
+            XCTAssertNotEqual( newShard, secretData, "New shard at index \(newShardIndex) is the plaintext secret" )
+
+            // Verify it is a real shard: with genuine shards not used to generate it, it restores the secret
+            let r = try ShamirCore.restore(shards: [(newShardIndex, newShard), shards[9], shards[10]])
+            XCTAssertEqual( r, secretData, "Shard generated at index \(newShardIndex) does not restore the secret" )
+        }
+    }
+
+    // Text of a thrown SimpleError, to assert that it names the offending value
+    private func errorMessage(_ error: Error) -> String {
+        return (error as? SimpleError)?.message ?? "\(error)"
+    }
+
 }
