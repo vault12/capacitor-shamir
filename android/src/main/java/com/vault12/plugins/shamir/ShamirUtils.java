@@ -172,7 +172,9 @@ public class ShamirUtils {
                 .distinct()
                 .count() == 1;
         if (!sizesAreEqual) { throw new SimpleException(TAG, "Shard files have varying sizes"); }
-        return new File(srcPaths[0]).length() - 1;
+        long srcLength = new File(srcPaths[0]).length() - 1;
+        if (srcLength <= 0) { throw new SimpleException(TAG, "Invalid shard files: a shard file must be an index byte followed by shard data"); }
+        return srcLength;
     }
 
     /**
